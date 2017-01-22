@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="gray_light">#DDE0E6</color>
+    <color name="gray_light_alpha">#99000000</color>
+    <color name="gray_dark">#6F7177</color>
+    <color name="blue_light">#293351</color>
+    <color name="login_button_pressed_color">#566285</color>
+    <color name="login_edit">#44FFFFFF</color>.
+    <color name="blue_dark_text">#20283E</color>
+    <color name="foreground">#55000000</color>
+</resources>
