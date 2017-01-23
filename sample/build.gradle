@@ -29,7 +29,6 @@ ext{
     butterknife = "8.4.0"
     picasso = "2.5.2"
     constraint = "1.0.0-beta4"
-    glide = "3.7.0"
 }
 
 dependencies {
@@ -53,9 +52,6 @@ dependencies {
 
     // Picasso
     compile "com.squareup.picasso:picasso:$picasso"
-
-    //Glide
-    compile "com.github.bumptech.glide:glide:$glide"
 
 }
 repositories {

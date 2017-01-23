@@ -10,20 +10,15 @@ import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.view.View
 import android.widget.ImageView
-import com.bumptech.glide.Glide
+import com.squareup.picasso.Picasso
 
 /**
  * Created by victor on 21/1/17.
  */
-fun ImageView.loadWithPicasso(imageUrl: String, cornerType: CornersTransformation.CornerType? = null) {
+fun ImageView.load(imageUrl: String) {
     visibility = View.VISIBLE
     if (!TextUtils.isEmpty(imageUrl)) {
-        if(cornerType != null) {
-            Glide.with(context).load(imageUrl).bitmapTransform(CornersTransformation(context, 6.toPx(context), 0, cornerType)).into(this)
-        }
-        else{
-            Glide.with(context).load(imageUrl).into(this)
-        }
+        Picasso.with(context).load(imageUrl).into(this)
     }
 }
 

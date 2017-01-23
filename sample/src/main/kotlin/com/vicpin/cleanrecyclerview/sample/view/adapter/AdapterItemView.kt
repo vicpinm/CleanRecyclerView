@@ -6,8 +6,7 @@ import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.vicpin.cleanrecyclerview.sample.R
-import com.vicpin.cleanrecyclerview.sample.extensions.CornersTransformation
-import com.vicpin.cleanrecyclerview.sample.extensions.loadWithPicasso
+import com.vicpin.cleanrecyclerview.sample.extensions.load
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import com.vicpin.cleanrecyclerview.sample.view.presenter.AdapterItemPresenter
 import com.vicpin.presenteradapter.ViewHolder
@@ -46,6 +45,6 @@ class AdapterItemView(itemView: View) : ViewHolder<Item>(itemView), AdapterItemP
     }
 
     override fun setImage(url: String) {
-        mImage.loadWithPicasso(url, CornersTransformation.CornerType.TOP)
+        mImage.load(url)
     }
 }

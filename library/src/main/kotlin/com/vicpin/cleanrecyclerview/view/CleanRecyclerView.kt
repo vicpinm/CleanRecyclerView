@@ -15,15 +15,13 @@ import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
 import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
 import com.vicpin.presenteradapter.PresenterAdapter
 import com.vicpin.presenteradapter.listeners.ItemClickListener
-
-
-
+import kotlin.reflect.KClass
 
 
 /**
  * Created by Victor on 20/01/2017.
  */
-class CleanRecyclerView<T> : RelativeLayout, CleanListPresenterImpl.View<T> {
+class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T> {
 
     private var mList: RecyclerView? = null
     private var mProgress: ProgressWheel? = null
@@ -83,6 +81,13 @@ class CleanRecyclerView<T> : RelativeLayout, CleanListPresenterImpl.View<T> {
         init()
     }
 
+    fun load(adapter: PresenterAdapter<T>, cloudDataSource: KClass<out CloudDataSource<T>>, cacheDataSource: KClass<out CacheDataSource<T>>) {
+        load(adapter, cloudDataSource.java, cacheDataSource.java)
+    }
+
+    fun load(adapter: PresenterAdapter<T>, cloudDataSource: Class<out CloudDataSource<T>>, cacheDataSource: Class<out CacheDataSource<T>>) {
+        load(adapter, cloudDataSource.newInstance(), cacheDataSource.newInstance())
+    }
 
     private fun init() {
         if (!inited && isAttached && adapter != null) {

@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import butterknife.ButterKnife
 import com.vicpin.cleanrecyclerview.sample.R
-import com.vicpin.cleanrecyclerview.sample.extensions.loadWithPicasso
+import com.vicpin.cleanrecyclerview.sample.extensions.load
 import com.vicpin.cleanrecyclerview.sample.extensions.startActivityWithTransition
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import kotlinx.android.synthetic.main.activity_detail.*
@@ -39,7 +39,7 @@ class DetailActivity : AppCompatActivity() {
         if(intent.hasExtra(ITEM_EXTRA)){
             val item = intent.getSerializableExtra(ITEM_EXTRA) as Item
             itemtitle.text = item.title
-            image.loadWithPicasso(item.imageUrl)
+            image.load(item.imageUrl)
             description.text = item.description
         }
     }
