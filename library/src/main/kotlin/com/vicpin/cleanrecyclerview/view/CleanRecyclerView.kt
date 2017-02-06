@@ -1,10 +1,13 @@
 package com.ubox.app.pagedrecyclerview
 
 import android.content.Context
+import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.RelativeLayout
 import com.pnikosis.materialishprogress.ProgressWheel
@@ -23,9 +26,20 @@ import kotlin.reflect.KClass
  */
 class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T> {
 
-    private var mList: RecyclerView? = null
-    private var mProgress: ProgressWheel? = null
-    private var mRefresh: SwipeRefreshLayout? = null
+    //public fields
+    var recyclerView: RecyclerView? = null
+    var itemDecoration : RecyclerView.ItemDecoration? = null
+
+    var layoutManager: RecyclerView.LayoutManager? = null
+        set(layoutManager) {
+            field = layoutManager
+            refresh()
+        }
+
+
+    //private fields
+    private var progress: ProgressWheel? = null
+    private var refresh: SwipeRefreshLayout? = null
     private var adapter: PresenterAdapter<T>? = null
     private lateinit var presenter: CleanListPresenterImpl<T>
     private var clickListener: ItemClickListener<T>? = null
@@ -65,13 +79,22 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     private fun inflateView() {
         inflate(context, R.layout.view_cleanrecyclerview, this)
-        mList = findViewById(R.id.recycler) as RecyclerView
-        mProgress = findViewById(R.id.progress) as ProgressWheel
-        mRefresh = findViewById(R.id.refresh) as SwipeRefreshLayout
+        progress = findViewById(R.id.progress) as ProgressWheel
+        refresh = findViewById(R.id.refresh) as SwipeRefreshLayout
+        inflateRecyclerView()
+    }
+
+    fun inflateRecyclerView(){
+        if (recyclerView == null){
+            //Default recycler view
+            recyclerView = RecyclerView(context)
+        }
+        refresh?.addView(recyclerView)
     }
 
 
     fun load(adapter: PresenterAdapter<T>, cloudDataSource: CloudDataSource<T>, cacheDataSource: CacheDataSource<T>) {
+        inited = false
         val repository = PagedListRepository(cacheDataSource, cloudDataSource)
         val useCase = PagedDataCase(repository)
         presenter = CleanListPresenterImpl(useCase)
@@ -94,25 +117,47 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             inited = true
             setupRecyclerView()
             presenter.pageLimit = itemsPerPage
+            presenter.init()
             presenter.fetchData()
+        }
+    }
+
+    private fun refresh(){
+        if(inited) {
+            setupRecyclerView()
+            adapter?.disableLoadMore()
+            presenter.refreshData()
         }
     }
 
 
     private fun setupRecyclerView() {
-        mList?.layoutManager = LinearLayoutManager(context)
-        mList?.adapter = adapter
-        mList?.addItemDecoration(RecyclerViewMargin(cellMargin))
-        mRefresh?.setOnRefreshListener { presenter.refreshData() }
+        if(this.layoutManager == null){
+            this.layoutManager = LinearLayoutManager(context)
+        }
+        recyclerView?.layoutManager = layoutManager
+        recyclerView?.adapter = adapter
+        updateDecoration()
+        refresh?.setOnRefreshListener { presenter.refreshData() }
+    }
 
+    private fun updateDecoration(){
+        recyclerView?.removeItemDecoration(itemDecoration)
+        if(layoutManager is GridLayoutManager){
+            itemDecoration = RecyclerViewMargin(cellMargin, (layoutManager as GridLayoutManager).spanCount, (layoutManager as GridLayoutManager).orientation)
+        }
+        else if(layoutManager is LinearLayoutManager) {
+            itemDecoration = RecyclerViewMargin(cellMargin, 1, (layoutManager as LinearLayoutManager).orientation)
+        }
+        recyclerView?.addItemDecoration(itemDecoration)
     }
 
     override fun showProgress() {
-        mProgress?.visibility = View.VISIBLE
+        progress?.visibility = View.VISIBLE
     }
 
     override fun hideProgress() {
-        mProgress?.visibility = View.GONE
+        progress?.visibility = View.GONE
     }
 
     override fun addData(data: List<T>) {
@@ -125,19 +170,19 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     override fun showLoadMore() {
         adapter?.enableLoadMore { presenter.loadNextPage() }
-
+        Handler().postDelayed({ Log.d("PRESENTER","Load more enabled")},0)
     }
 
     override fun hideLoadMore() {
-        adapter?.disableLoadMore()
+        Handler().postDelayed({ adapter?.disableLoadMore() },100)
     }
 
     override fun showRefreshing() {
-        mRefresh?.isRefreshing = true
+        refresh?.isRefreshing = true
     }
 
     override fun hideRefreshing() {
-        mRefresh?.isRefreshing = false
+        refresh?.isRefreshing = false
     }
 
     fun onItemClick(listener: ItemClickListener<T>) {

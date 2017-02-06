@@ -36,3 +36,4 @@ fun Activity.startActivityWithTransition(intent : Intent, sharedView: View, tran
         startActivity(intent)
     }
 }
+

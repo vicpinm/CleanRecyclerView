@@ -22,9 +22,11 @@ class ItemService : CloudDataSource<Item>{
         val index = startFrom * PAGE_LIMIT
 
         val list = mutableListOf<Item>()
-        val item1 = Item("Material card ${index + 1}",description,"https://s-media-cache-ak0.pinimg.com/736x/c4/30/40/c4304020ba04dfc3ad212e94515fe1f4.jpg")
 
-        list.add(item1)
+        if(startFrom < 3) {
+            val item1 = Item("Material card ${index + 1}", description, "https://s-media-cache-ak0.pinimg.com/736x/c4/30/40/c4304020ba04dfc3ad212e94515fe1f4.jpg")
+            list.add(item1)
+        }
 
         if (startFrom < 2) {
             val item2 = Item("Material card ${index + 2}",description,"https://lh3.googleusercontent.com/-JjdCDI4-CJg/V0v8Tk3ng7I/AAAAAAABq7o/6fRDNinKmzoURluAg29-hp8LPysvUc_PA/w800-h800/Material-Design-3.jpg")

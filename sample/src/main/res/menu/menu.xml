@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/vertical"
+          android:title="@string/vertical"
+          app:showAsAction="never"/>
+    <item android:id="@+id/horizontal"
+          android:title="@string/horizontal"
+          app:showAsAction="never"/>
+    <item android:id="@+id/grid"
+          android:title="@string/grid"
+          app:showAsAction="never"/>
+</menu>

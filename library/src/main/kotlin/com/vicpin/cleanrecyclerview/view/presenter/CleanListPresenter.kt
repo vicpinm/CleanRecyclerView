@@ -1,9 +1,11 @@
 package com.ubox.app.main.view.presenter
 
+import android.util.Log
 import com.ubox.app.pagedrecyclerview.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import com.vicpin.cleanrecyclerview.view.presenter.ICleanRecyclerView
 import rx.functions.Action1
+import java.util.*
 
 
 /**
@@ -15,8 +17,18 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     protected var itemsLoadedSize = 0
     protected var currentPage = 0
 
-    fun fetchData() {
-        showProgress()
+    fun init(){
+        currentPage = 0
+        itemsLoadedSize = 0
+        Log.d("PRESENTER","init - Disabling load more")
+        mView?.hideLoadMore()
+    }
+
+    fun fetchData(fromRefresh : Boolean = false) {
+        Log.d("PRESENTER","fetchData " + fromRefresh + " PAGE " + currentPage)
+        if(!fromRefresh) {
+            showProgress()
+        }
         executeUseCase()
     }
 
@@ -27,10 +39,15 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
     private fun onDataFetched(source: CRDataSource, data: List<Data>) {
 
+        Log.d("PRESENTER","onDataFetched " + source.name + " size " + data.size)
+
         itemsLoadedSize += data.size
 
         if (data.isNotEmpty()) {
             loadDataIntoView(data)
+        }
+        else if(currentPage == 0){
+            clearDataFromView()
         }
 
         updateRefreshingWidget(source)
@@ -56,6 +73,10 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         } else {
             mView?.addData(data)
         }
+    }
+
+    private fun clearDataFromView(){
+        mView?.setData(ArrayList<Data>())
     }
 
     private fun updateLoadMoreIndicator(source: CRDataSource, itemsLoaded: Int) {
@@ -92,14 +113,14 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     }
 
     fun loadNextPage() {
+        Log.d("PRESENTER","loadNextPage")
         currentPage++
         fetchData()
     }
 
     fun refreshData() {
-        currentPage = 0
-        itemsLoadedSize = 0
-        fetchData()
+        init()
+        fetchData(fromRefresh = true)
     }
 
     abstract val dataCase: PagedDataCase<Data>
