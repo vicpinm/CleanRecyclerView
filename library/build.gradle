@@ -30,7 +30,7 @@ ext {
     support = "25.1.0"
     rx = "1.2.1"
     materialish = "1.7"
-    presenter_adapter = "1.5.8"
+    presenter_adapter = "1.6.0"
     autosubscription = '1.0.1'
 }
 
@@ -55,6 +55,7 @@ dependencies {
 
     compile "com.github.vicpinm:presenteradapter:$presenter_adapter"
     compile "com.github.vicpinm:autosubscription:$autosubscription"
+
 
 
 }

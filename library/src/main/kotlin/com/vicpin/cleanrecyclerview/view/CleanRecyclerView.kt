@@ -2,19 +2,22 @@ package com.ubox.app.pagedrecyclerview
 
 import android.content.Context
 import android.os.Handler
+import android.support.annotation.LayoutRes
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import com.pnikosis.materialishprogress.ProgressWheel
 import com.vicpin.cleanrecyclerview.R
+import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
 import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
 import com.vicpin.presenteradapter.PresenterAdapter
 import com.vicpin.presenteradapter.listeners.ItemClickListener
@@ -40,6 +43,8 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     //private fields
     private var progress: ProgressWheel? = null
     private var refresh: SwipeRefreshLayout? = null
+    private var empty: FrameLayout? = null
+
     private var adapter: PresenterAdapter<T>? = null
     private lateinit var presenter: CleanListPresenterImpl<T>
     private var clickListener: ItemClickListener<T>? = null
@@ -47,7 +52,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var isAttached = false
     private var itemsPerPage = 0
     private var cellMargin = 10
-
+    private var emptyLayout : Int = 0
 
     constructor(context: Context?) : super(context)
 
@@ -65,6 +70,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         try {
             itemsPerPage = a?.getInt(R.styleable.CleanRecyclerView_itemsPerPage, 0) ?: 0
             cellMargin = a?.getDimensionPixelSize(R.styleable.CleanRecyclerView_cellMargin, 10) ?: 10
+            emptyLayout = a?.getResourceId(R.styleable.CleanRecyclerView_emptyLayout, 0) ?: 0
         } finally {
             a?.recycle()
         }
@@ -81,6 +87,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         inflate(context, R.layout.view_cleanrecyclerview, this)
         progress = findViewById(R.id.progress) as ProgressWheel
         refresh = findViewById(R.id.refresh) as SwipeRefreshLayout
+        empty = findViewById(R.id.empty) as FrameLayout
         inflateRecyclerView()
     }
 
@@ -93,7 +100,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     }
 
 
-    fun load(adapter: PresenterAdapter<T>, cloudDataSource: CloudDataSource<T>, cacheDataSource: CacheDataSource<T>) {
+    fun loadPaged(adapter: PresenterAdapter<T>, cloudDataSource: CloudPagedDataSource<T>, cacheDataSource: CacheDataSource<T>) {
         inited = false
         val repository = PagedListRepository(cacheDataSource, cloudDataSource)
         val useCase = PagedDataCase(repository)
@@ -104,6 +111,25 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         init()
     }
 
+    fun loadPaged(adapter: PresenterAdapter<T>, cloudDataSource: KClass<out CloudPagedDataSource<T>>, cacheDataSource: KClass<out CacheDataSource<T>>) {
+        loadPaged(adapter, cloudDataSource.java, cacheDataSource.java)
+    }
+
+    fun loadPaged(adapter: PresenterAdapter<T>, cloudDataSource: Class<out CloudPagedDataSource<T>>, cacheDataSource: Class<out CacheDataSource<T>>) {
+        loadPaged(adapter, cloudDataSource.newInstance(), cacheDataSource.newInstance())
+    }
+
+    fun load(adapter: PresenterAdapter<T>, cloudDataSource: CloudDataSource<T>, cacheDataSource: CacheDataSource<T>) {
+        inited = false
+        val repository = ListRepository(cacheDataSource, cloudDataSource)
+        val useCase = PagedDataCase(repository)
+        presenter = CleanListPresenterImpl(useCase)
+        presenter.mView = this
+        this.adapter = adapter
+        this.adapter?.setItemClickListener { item, viewHolder -> clickListener?.onItemClick(item, viewHolder) }
+        init(paged = false)
+    }
+
     fun load(adapter: PresenterAdapter<T>, cloudDataSource: KClass<out CloudDataSource<T>>, cacheDataSource: KClass<out CacheDataSource<T>>) {
         load(adapter, cloudDataSource.java, cacheDataSource.java)
     }
@@ -112,13 +138,13 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         load(adapter, cloudDataSource.newInstance(), cacheDataSource.newInstance())
     }
 
-    private fun init() {
+    private fun init(paged : Boolean = true) {
         if (!inited && isAttached && adapter != null) {
-            inited = true
             setupRecyclerView()
-            presenter.pageLimit = itemsPerPage
+            presenter.pageLimit = if(paged) itemsPerPage else 0
             presenter.init()
             presenter.fetchData()
+            inited = true
         }
     }
 
@@ -153,6 +179,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     }
 
     override fun showProgress() {
+        hideEmptyLayout()
         progress?.visibility = View.VISIBLE
     }
 
@@ -169,8 +196,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     }
 
     override fun showLoadMore() {
-        adapter?.enableLoadMore { presenter.loadNextPage() }
-        Handler().postDelayed({ Log.d("PRESENTER","Load more enabled")},0)
+        Handler().postDelayed({ adapter?.enableLoadMore { presenter.loadNextPage() }},150)
     }
 
     override fun hideLoadMore() {
@@ -205,5 +231,21 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         presenter.pageLimit = numItems
     }
 
+    fun setEmptyLayout(@LayoutRes layoutRes : Int){
+        this.emptyLayout = layoutRes
+    }
 
+    override fun showEmptyLayout() {
+        if(emptyLayout > 0){
+            if(empty?.childCount == 0) {
+                val view = View.inflate(context, emptyLayout, null)
+                empty?.addView(view)
+            }
+            empty?.visibility = View.VISIBLE
+        }
+    }
+
+    override fun hideEmptyLayout(){
+        empty?.visibility = View.GONE
+    }
 }

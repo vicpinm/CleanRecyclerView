@@ -1,6 +1,5 @@
 package com.ubox.app.main.view.presenter
 
-import android.util.Log
 import com.ubox.app.pagedrecyclerview.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import com.vicpin.cleanrecyclerview.view.presenter.ICleanRecyclerView
@@ -20,12 +19,10 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     fun init(){
         currentPage = 0
         itemsLoadedSize = 0
-        Log.d("PRESENTER","init - Disabling load more")
         mView?.hideLoadMore()
     }
 
     fun fetchData(fromRefresh : Boolean = false) {
-        Log.d("PRESENTER","fetchData " + fromRefresh + " PAGE " + currentPage)
         if(!fromRefresh) {
             showProgress()
         }
@@ -38,9 +35,6 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     }
 
     private fun onDataFetched(source: CRDataSource, data: List<Data>) {
-
-        Log.d("PRESENTER","onDataFetched " + source.name + " size " + data.size)
-
         itemsLoadedSize += data.size
 
         if (data.isNotEmpty()) {
@@ -48,6 +42,9 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         }
         else if(currentPage == 0){
             clearDataFromView()
+            if(source == CRDataSource.CLOUD){
+                showEmptyLayout()
+            }
         }
 
         updateRefreshingWidget(source)
@@ -56,18 +53,25 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
     }
 
+    private fun showEmptyLayout() {
+        mView?.showEmptyLayout()
+        mView?.hideProgress()
+    }
+
     private fun updateRefreshingWidget(source : CRDataSource){
 
         if (currentPage == 0) {
             if (source == CRDataSource.DISK && itemsLoadedSize > 0) {
                 mView?.showRefreshing()
-            } else {
+            } else if(source == CRDataSource.CLOUD){
                 mView?.hideRefreshing()
             }
         }
     }
 
     private fun loadDataIntoView(data : List<Data>){
+        mView?.hideEmptyLayout()
+
         if (currentPage == 0) {
             mView?.setData(data)
         } else {
@@ -113,7 +117,6 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     }
 
     fun loadNextPage() {
-        Log.d("PRESENTER","loadNextPage")
         currentPage++
         fetchData()
     }

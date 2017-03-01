@@ -34,6 +34,11 @@ constructor(mUseCase : PagedDataCase<T>) : CleanListPresenter<T, CleanListPresen
         override fun showRefreshing()
 
         override fun hideRefreshing()
+
+        override fun showEmptyLayout()
+
+        override fun hideEmptyLayout()
+
     }
 
 

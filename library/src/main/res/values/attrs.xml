@@ -3,5 +3,6 @@
     <declare-styleable name="CleanRecyclerView">
         <attr name="itemsPerPage" format="integer" />
         <attr name="cellMargin" format="dimension"/>
+        <attr name="emptyLayout" format="reference" />
     </declare-styleable>
 </resources>

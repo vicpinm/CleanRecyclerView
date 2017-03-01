@@ -19,4 +19,8 @@ interface ICleanRecyclerView<T> {
     fun showRefreshing()
 
     fun hideRefreshing()
+
+    fun showEmptyLayout()
+
+    fun hideEmptyLayout()
 }

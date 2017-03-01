@@ -5,7 +5,7 @@ import rx.Observable
 /**
  * Created by Victor on 20/01/2017.
  */
-interface CloudDataSource<T> {
+interface CloudPagedDataSource<T> {
 
-    fun getData(): Observable<List<T>>
+    fun getData(page: Int): Observable<List<T>>
 }
