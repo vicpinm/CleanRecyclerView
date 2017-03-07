@@ -1,6 +1,6 @@
-package com.ubox.app.pagedrecyclerview
+package com.vicpin.cleanrecyclerview.domain
 
-import com.vicpin.cleanrecyclerview.CRUseCase
+import com.vicpin.cleanrecyclerview.domain.CRUseCase
 import com.vicpin.cleanrecyclerview.repository.IRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 

@@ -1,7 +1,7 @@
-package com.ubox.app.pagedrecyclerview
+package com.vicpin.cleanrecyclerview.view.presenter
 
-import com.ubox.app.main.view.presenter.CleanListPresenter
-import com.vicpin.cleanrecyclerview.view.presenter.ICleanRecyclerView
+import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenter
+import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpinm.autosubscription.Unsubscriber
 import com.vicpinm.autosubscription.anotations.AutoSubscription
 

@@ -1,4 +1,4 @@
-package com.ubox.app.pagedrecyclerview
+package com.vicpin.cleanrecyclerview.view
 
 import android.content.Context
 import android.os.Handler
@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import com.pnikosis.materialishprogress.ProgressWheel
+import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenterImpl
+import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
@@ -19,8 +21,8 @@ import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
 import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
-import com.vicpin.presenteradapter.PresenterAdapter
-import com.vicpin.presenteradapter.listeners.ItemClickListener
+import com.vicpin.kpresenteradapter.PresenterAdapter
+import com.vicpin.kpresenteradapter.ViewHolder
 import kotlin.reflect.KClass
 
 
@@ -47,7 +49,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     private var adapter: PresenterAdapter<T>? = null
     private lateinit var presenter: CleanListPresenterImpl<T>
-    private var clickListener: ItemClickListener<T>? = null
+    private var clickListener: ((T, ViewHolder<T>) -> Unit) ? = null
     private var inited = false
     private var isAttached = false
     private var itemsPerPage = 0
@@ -107,7 +109,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         presenter = CleanListPresenterImpl(useCase)
         presenter.mView = this
         this.adapter = adapter
-        this.adapter?.setItemClickListener { item, viewHolder -> clickListener?.onItemClick(item, viewHolder) }
+        this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
         init()
     }
 
@@ -126,7 +128,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         presenter = CleanListPresenterImpl(useCase)
         presenter.mView = this
         this.adapter = adapter
-        this.adapter?.setItemClickListener { item, viewHolder -> clickListener?.onItemClick(item, viewHolder) }
+        this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
         init(paged = false)
     }
 
@@ -192,7 +194,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     }
 
     override fun setData(data: List<T>) {
-        adapter?.data = data
+        adapter?.setData(data)
     }
 
     override fun showLoadMore() {
@@ -211,7 +213,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         refresh?.isRefreshing = false
     }
 
-    fun onItemClick(listener: ItemClickListener<T>) {
+    fun onItemClick(listener: ((T, ViewHolder<T>) -> Unit)) {
         this.clickListener = listener
     }
 

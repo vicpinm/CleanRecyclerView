@@ -6,15 +6,14 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
-import com.ubox.app.pagedrecyclerview.CleanRecyclerView
+import com.vicpin.cleanrecyclerview.view.CleanRecyclerView
 import com.vicpin.cleanrecyclerview.sample.R
 import com.vicpin.cleanrecyclerview.sample.data.ItemCache
 import com.vicpin.cleanrecyclerview.sample.data.ItemPagedService
 import com.vicpin.cleanrecyclerview.sample.data.ItemService
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import com.vicpin.cleanrecyclerview.sample.view.adapter.AdapterItemView
-import com.vicpin.presenteradapter.SimplePresenterAdapter
-import com.vicpin.presenteradapter.listeners.ItemClickListener
+import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -34,11 +33,11 @@ class MainActivity : AppCompatActivity() {
         menuItem?.title = getString(R.string.no_paginated)
 
         val cleanRecyclerView = list as CleanRecyclerView<Item>
-        val adapter = SimplePresenterAdapter.with(AdapterItemView::class.java).setLayout(R.layout.adapter_item)
+        val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
         cleanRecyclerView.loadPaged(adapter, ItemPagedService::class, ItemCache::class)
 
-        cleanRecyclerView.onItemClick(ItemClickListener { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) })
+        cleanRecyclerView.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }
     }
 
     fun initNoPagedList() {
@@ -47,11 +46,11 @@ class MainActivity : AppCompatActivity() {
         menuItem?.title = getString(R.string.paginated)
 
         val cleanRecyclerView = list as CleanRecyclerView<Item>
-        val adapter = SimplePresenterAdapter.with(AdapterItemView::class.java).setLayout(R.layout.adapter_item)
+        val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
         cleanRecyclerView.load(adapter, ItemService::class, ItemCache::class)
 
-        cleanRecyclerView.onItemClick(ItemClickListener { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) })
+        cleanRecyclerView.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

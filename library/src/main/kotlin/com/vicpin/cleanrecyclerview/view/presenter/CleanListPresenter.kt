@@ -1,8 +1,7 @@
-package com.ubox.app.main.view.presenter
+package com.vicpin.cleanrecyclerview.view.presenter
 
-import com.ubox.app.pagedrecyclerview.PagedDataCase
+import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
-import com.vicpin.cleanrecyclerview.view.presenter.ICleanRecyclerView
 import rx.functions.Action1
 import java.util.*
 

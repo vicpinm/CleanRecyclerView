@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview
+package com.vicpin.cleanrecyclerview.domain
 
 
 import com.vicpinm.autosubscription.UnsubscribeListener
