@@ -7,7 +7,7 @@ import rx.Observable
  */
 interface CacheDataSource<T> {
 
-    val data : Observable<List<T>>
+    fun getData() : Observable<List<T>>
 
     fun clearData()
 

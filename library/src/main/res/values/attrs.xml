@@ -4,5 +4,6 @@
         <attr name="itemsPerPage" format="integer" />
         <attr name="cellMargin" format="dimension"/>
         <attr name="emptyLayout" format="reference" />
+        <attr name="errorLayout" format="reference" />
     </declare-styleable>
 </resources>

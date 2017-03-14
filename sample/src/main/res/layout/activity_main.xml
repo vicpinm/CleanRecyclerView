@@ -13,5 +13,6 @@
         android:layout_height="match_parent"
         app:itemsPerPage="5"
         app:emptyLayout="@layout/empty_layout"
+        app:errorLayout="@layout/empty_layout_error"
         app:cellMargin="14dp"/>
 </RelativeLayout>

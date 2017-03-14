@@ -15,7 +15,7 @@ class ListRepository<T> constructor(internal var cache: CacheDataSource<T>, inte
     }
 
     override fun getDataFromDisk(): Observable<Pair<CRDataSource, List<T>>> {
-        return cache.data.map { list ->
+        return cache.getData().map { list ->
             Pair<CRDataSource, List<T>>(CRDataSource.DISK, list)
         }
     }

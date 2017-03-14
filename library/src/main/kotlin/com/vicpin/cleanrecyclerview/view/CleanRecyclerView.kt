@@ -12,14 +12,14 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import com.pnikosis.materialishprogress.ProgressWheel
-import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenterImpl
-import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.R
+import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
+import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenterImpl
 import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
 import com.vicpin.kpresenteradapter.PresenterAdapter
 import com.vicpin.kpresenteradapter.ViewHolder
@@ -46,6 +46,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var progress: ProgressWheel? = null
     private var refresh: SwipeRefreshLayout? = null
     private var empty: FrameLayout? = null
+    private var emptyError: FrameLayout? = null
 
     private var adapter: PresenterAdapter<T>? = null
     private lateinit var presenter: CleanListPresenterImpl<T>
@@ -55,6 +56,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var itemsPerPage = 0
     private var cellMargin = 10
     private var emptyLayout : Int = 0
+    private var errorLayout : Int = 0
 
     constructor(context: Context?) : super(context)
 
@@ -73,6 +75,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             itemsPerPage = a?.getInt(R.styleable.CleanRecyclerView_itemsPerPage, 0) ?: 0
             cellMargin = a?.getDimensionPixelSize(R.styleable.CleanRecyclerView_cellMargin, 10) ?: 10
             emptyLayout = a?.getResourceId(R.styleable.CleanRecyclerView_emptyLayout, 0) ?: 0
+            errorLayout = a?.getResourceId(R.styleable.CleanRecyclerView_errorLayout, 0) ?: 0
         } finally {
             a?.recycle()
         }
@@ -90,6 +93,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         progress = findViewById(R.id.progress) as ProgressWheel
         refresh = findViewById(R.id.refresh) as SwipeRefreshLayout
         empty = findViewById(R.id.empty) as FrameLayout
+        emptyError = findViewById(R.id.emptyError) as FrameLayout
         inflateRecyclerView()
     }
 
@@ -237,6 +241,10 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         this.emptyLayout = layoutRes
     }
 
+    fun setErrorLayout(@LayoutRes layoutRes : Int){
+        this.errorLayout = layoutRes
+    }
+
     override fun showEmptyLayout() {
         if(emptyLayout > 0){
             if(empty?.childCount == 0) {
@@ -247,7 +255,18 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         }
     }
 
+    override fun showErrorEmptyLayout() {
+        if(errorLayout > 0){
+            if(emptyError?.childCount == 0) {
+                val view = View.inflate(context, errorLayout, null)
+                emptyError?.addView(view)
+            }
+            emptyError?.visibility = View.VISIBLE
+        }
+    }
+
     override fun hideEmptyLayout(){
         empty?.visibility = View.GONE
+        emptyError?.visibility = View.GONE
     }
 }

@@ -17,7 +17,6 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
     fun init(){
         currentPage = 0
-        itemsLoadedSize = 0
         mView?.hideLoadMore()
     }
 
@@ -80,6 +79,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
     private fun clearDataFromView(){
         mView?.setData(ArrayList<Data>())
+        itemsLoadedSize = 0
     }
 
     private fun updateLoadMoreIndicator(source: CRDataSource, itemsLoaded: Int) {
@@ -112,6 +112,12 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     private fun dataLoadError(ex: Throwable) {
         mView?.hideProgress()
         mView?.hideRefreshing()
+        mView?.hideEmptyLayout()
+
+        if(itemsLoadedSize == 0) {
+            mView?.showErrorEmptyLayout()
+        }
+
         ex.printStackTrace()
     }
 

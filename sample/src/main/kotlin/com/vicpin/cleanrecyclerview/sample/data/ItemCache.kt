@@ -11,8 +11,8 @@ class ItemCache : CacheDataSource<Item>{
 
     var memoryCache = mutableListOf<Item>()
 
-    override val data: Observable<List<Item>>
-        get() = Observable.just(memoryCache)
+
+    override fun getData() = Observable.just(memoryCache.toList())
 
     override fun clearData() {
         memoryCache.clear()

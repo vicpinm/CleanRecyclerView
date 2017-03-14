@@ -23,4 +23,6 @@ interface ICleanRecyclerView<T> {
     fun showEmptyLayout()
 
     fun hideEmptyLayout()
+
+    fun showErrorEmptyLayout()
 }
