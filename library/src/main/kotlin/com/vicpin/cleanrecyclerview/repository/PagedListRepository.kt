@@ -4,6 +4,7 @@ import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
 import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
 
 /**
  * Created by Victor on 20/01/2017.
@@ -12,7 +13,7 @@ class PagedListRepository<T> constructor(internal var cache: CacheDataSource<T>,
 
     override fun getData(currentPage: Int): Observable<Pair<CRDataSource, List<T>>> {
         if (currentPage == 0) {
-            return getDataFromDisk().mergeWith(getDataPageFromCloud(currentPage))
+            return Observable.concat(getDataFromDisk().observeOn(AndroidSchedulers.mainThread()),getDataPageFromCloud(currentPage).observeOn(AndroidSchedulers.mainThread()))
         } else {
             return getDataPageFromCloud(currentPage)
         }
