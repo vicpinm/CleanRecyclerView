@@ -4,6 +4,7 @@ package com.vicpin.cleanrecyclerview.domain
 import com.vicpinm.autosubscription.UnsubscribeListener
 import rx.Observable
 import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
 
@@ -22,6 +23,7 @@ abstract class CRUseCase<T> : UnsubscribeListener {
 
         Observable.defer { buildUseCase() }
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnError { it.printStackTrace() }
                 .subscribe(getSubscriber())
 
@@ -35,6 +37,7 @@ abstract class CRUseCase<T> : UnsubscribeListener {
 
         Observable.defer { buildUseCase() }
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnError { it.printStackTrace() }
                 .subscribe(getSubscriber())
     }

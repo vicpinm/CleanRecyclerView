@@ -5,6 +5,7 @@ import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 /**
  * Created by Victor on 20/01/2017.
@@ -12,7 +13,7 @@ import rx.android.schedulers.AndroidSchedulers
 class ListRepository<T> constructor(internal var cache: CacheDataSource<T>, internal var cloud: CloudDataSource<T>) : IRepository<T>  {
 
     override fun getData(currentPage: Int): Observable<Pair<CRDataSource, List<T>>> {
-        return Observable.concat(getDataFromDisk().observeOn(AndroidSchedulers.mainThread()),getDataPageFromCloud(currentPage).observeOn(AndroidSchedulers.mainThread()))
+        return Observable.concat(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()),getDataPageFromCloud(currentPage).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
     }
 
     override fun getDataFromDisk(): Observable<Pair<CRDataSource, List<T>>> {
