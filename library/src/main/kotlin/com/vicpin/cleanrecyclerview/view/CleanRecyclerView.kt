@@ -3,6 +3,7 @@ package com.vicpin.cleanrecyclerview.view
 import android.content.Context
 import android.os.Handler
 import android.support.annotation.LayoutRes
+import android.support.annotation.StringRes
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -11,6 +12,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
+import android.widget.Toast
 import com.pnikosis.materialishprogress.ProgressWheel
 import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.PagedDataCase
@@ -57,11 +59,12 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var cellMargin = 10
     private var emptyLayout : Int = 0
     private var errorLayout : Int = 0
+    private var errorLoadMore : Int = 0
 
     constructor(context: Context?) : super(context)
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-       processAttrs(attrs)
+        processAttrs(attrs)
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){
@@ -76,6 +79,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             cellMargin = a?.getDimensionPixelSize(R.styleable.CleanRecyclerView_cellMargin, 10) ?: 10
             emptyLayout = a?.getResourceId(R.styleable.CleanRecyclerView_emptyLayout, 0) ?: 0
             errorLayout = a?.getResourceId(R.styleable.CleanRecyclerView_errorLayout, 0) ?: 0
+            errorLoadMore = a?.getResourceId(R.styleable.CleanRecyclerView_errorLoadMore, 0) ?: 0
         } finally {
             a?.recycle()
         }
@@ -245,6 +249,10 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         this.errorLayout = layoutRes
     }
 
+    fun setErrorLoadMore(@StringRes stringRes : Int){
+        this.errorLoadMore = stringRes
+    }
+
     override fun showEmptyLayout() {
         if(emptyLayout > 0){
             if(empty?.childCount == 0) {
@@ -268,5 +276,11 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     override fun hideEmptyLayout(){
         empty?.visibility = View.GONE
         emptyError?.visibility = View.GONE
+    }
+
+    override fun showLoadMoreError() {
+        if(errorLoadMore > 0) {
+            Toast.makeText(context, errorLoadMore, Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -14,10 +14,11 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     var mView: View? = null
     protected var itemsLoadedSize = 0
     protected var currentPage = 0
+    private var isShowingLoadMore = false;
 
     fun init(){
         currentPage = 0
-        mView?.hideLoadMore()
+        hideLoadMore()
     }
 
     fun fetchData(fromRefresh : Boolean = false) {
@@ -85,11 +86,12 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     private fun updateLoadMoreIndicator(source: CRDataSource, itemsLoaded: Int) {
 
         if (source == CRDataSource.DISK) {
-            mView?.hideLoadMore()
+            hideLoadMore()
         } else {
             if (pageLimit == 0 || itemsLoaded < pageLimit) {
-                mView?.hideLoadMore()
+                hideLoadMore()
             } else {
+                isShowingLoadMore = true
                 mView?.showLoadMore()
             }
         }
@@ -109,10 +111,21 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         }
     }
 
+    private fun hideLoadMore(){
+        isShowingLoadMore = false
+        mView?.hideLoadMore()
+    }
+
     private fun dataLoadError(ex: Throwable) {
         mView?.hideProgress()
         mView?.hideRefreshing()
         mView?.hideEmptyLayout()
+
+        if(isShowingLoadMore){
+            mView?.showLoadMoreError()
+        }
+
+        hideLoadMore()
 
         if(itemsLoadedSize == 0) {
             mView?.showErrorEmptyLayout()
