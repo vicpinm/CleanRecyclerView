@@ -7,7 +7,7 @@ android {
     buildToolsVersion "25.0.2"
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -30,7 +30,7 @@ ext {
     support = "25.1.0"
     rx = "1.2.1"
     materialish = "1.7"
-    presenter_adapter = "1.0.5"
+    presenter_adapter = "1.0.6"
     autosubscription = '1.0.1'
 }
 

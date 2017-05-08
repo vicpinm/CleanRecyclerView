@@ -34,6 +34,7 @@ import kotlin.reflect.KClass
 class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T> {
 
     //public fields
+    var refresh: SwipeRefreshLayout? = null
     var recyclerView: RecyclerView? = null
     var itemDecoration : RecyclerView.ItemDecoration? = null
 
@@ -46,10 +47,8 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     //private fields
     private var progress: ProgressWheel? = null
-    private var refresh: SwipeRefreshLayout? = null
     private var empty: FrameLayout? = null
     private var emptyError: FrameLayout? = null
-
     private var adapter: PresenterAdapter<T>? = null
     private lateinit var presenter: CleanListPresenterImpl<T>
     private var clickListener: ((T, ViewHolder<T>) -> Unit) ? = null
@@ -90,6 +89,8 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         inflateView()
         isAttached = true
         init()
+        loadEmptyLayout()
+        loadErrorLayout()
     }
 
     private fun inflateView() {
@@ -98,15 +99,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         refresh = findViewById(R.id.refresh) as SwipeRefreshLayout
         empty = findViewById(R.id.empty) as FrameLayout
         emptyError = findViewById(R.id.emptyError) as FrameLayout
-        inflateRecyclerView()
-    }
-
-    fun inflateRecyclerView(){
-        if (recyclerView == null){
-            //Default recycler view
-            recyclerView = RecyclerView(context)
-        }
-        refresh?.addView(recyclerView)
+        recyclerView = findViewById(R.id.recyclerListView) as RecyclerView
     }
 
 
@@ -243,34 +236,42 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     fun setEmptyLayout(@LayoutRes layoutRes : Int){
         this.emptyLayout = layoutRes
+        loadEmptyLayout()
     }
 
     fun setErrorLayout(@LayoutRes layoutRes : Int){
         this.errorLayout = layoutRes
+        loadErrorLayout()
     }
 
     fun setErrorLoadMore(@StringRes stringRes : Int){
         this.errorLoadMore = stringRes
     }
 
-    override fun showEmptyLayout() {
-        if(emptyLayout > 0){
-            if(empty?.childCount == 0) {
+    fun loadEmptyLayout() {
+        if (emptyLayout > 0) {
+            if (empty?.childCount == 0) {
                 val view = View.inflate(context, emptyLayout, null)
                 empty?.addView(view)
             }
-            empty?.visibility = View.VISIBLE
         }
     }
 
-    override fun showErrorEmptyLayout() {
+    fun loadErrorLayout(){
         if(errorLayout > 0){
             if(emptyError?.childCount == 0) {
                 val view = View.inflate(context, errorLayout, null)
                 emptyError?.addView(view)
             }
-            emptyError?.visibility = View.VISIBLE
         }
+    }
+
+    override fun showEmptyLayout() {
+        empty?.visibility = View.VISIBLE
+    }
+
+    override fun showErrorEmptyLayout() {
+        emptyError?.visibility = View.VISIBLE
     }
 
     override fun hideEmptyLayout(){
