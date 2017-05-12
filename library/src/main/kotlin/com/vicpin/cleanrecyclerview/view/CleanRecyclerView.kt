@@ -59,6 +59,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var emptyLayout : Int = 0
     private var errorLayout : Int = 0
     private var errorLoadMore : Int = 0
+    private var attachedListener : (() -> Unit)? = null
 
     constructor(context: Context?) : super(context)
 
@@ -84,6 +85,15 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         }
     }
 
+    fun setOnAttachedListener(listener : () -> Unit){
+        if(inited){
+            listener()
+        }
+        else{
+            this.attachedListener = listener
+        }
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         inflateView()
@@ -91,6 +101,10 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         init()
         loadEmptyLayout()
         loadErrorLayout()
+
+        if(attachedListener != null){
+            this.attachedListener?.invoke()
+        }
     }
 
     private fun inflateView() {
