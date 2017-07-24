@@ -7,7 +7,7 @@ import rx.Observable
 /**
  * Created by victor on 21/1/17.
  */
-class ItemCache : CacheDataSource<Item>{
+open class ItemCache: CacheDataSource<Item>{
 
     var memoryCache = mutableListOf<Item>()
 

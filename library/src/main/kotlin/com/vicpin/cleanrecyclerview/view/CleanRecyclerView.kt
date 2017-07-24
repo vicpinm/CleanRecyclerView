@@ -51,7 +51,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var empty: FrameLayout? = null
     private var emptyError: FrameLayout? = null
     private var adapter: PresenterAdapter<T>? = null
-    private lateinit var presenter: CleanListPresenterImpl<T>
+    private var presenter: CleanListPresenterImpl<T>? = null
     private var clickListener: ((T, ViewHolder<T>) -> Unit) ? = null
     private var inited = false
     private var isAttached = false
@@ -123,7 +123,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         val repository = PagedListRepository(cacheDataSource, cloudDataSource)
         val useCase = PagedDataCase(repository)
         presenter = CleanListPresenterImpl(useCase)
-        presenter.mView = this
+        presenter?.mView = this
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
         init()
@@ -142,7 +142,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         val repository = ListRepository(cacheDataSource, cloudDataSource)
         val useCase = PagedDataCase(repository)
         presenter = CleanListPresenterImpl(useCase)
-        presenter.mView = this
+        presenter?.mView = this
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
         init(paged = false)
@@ -159,9 +159,9 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private fun init(paged : Boolean = true) {
         if (!inited && isAttached && adapter != null) {
             setupRecyclerView()
-            presenter.pageLimit = if(paged) itemsPerPage else 0
-            presenter.init()
-            presenter.fetchData()
+            presenter?.pageLimit = if(paged) itemsPerPage else 0
+            presenter?.init()
+            presenter?.fetchData()
             inited = true
         }
     }
@@ -170,7 +170,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         if(inited) {
             setupRecyclerView()
             adapter?.disableLoadMore()
-            presenter.refreshData()
+            presenter?.refreshData()
         }
     }
 
@@ -182,7 +182,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         recyclerView?.layoutManager = layoutManager
         recyclerView?.adapter = adapter
         updateDecoration()
-        refresh?.setOnRefreshListener { presenter.refreshData() }
+        refresh?.setOnRefreshListener { presenter?.refreshData() }
     }
 
     private fun updateDecoration(){
@@ -214,7 +214,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     }
 
     override fun showLoadMore() {
-        Handler().postDelayed({ adapter?.enableLoadMore { presenter.loadNextPage() }},150)
+        Handler().postDelayed({ adapter?.enableLoadMore { presenter?.loadNextPage() }},150)
     }
 
     override fun hideLoadMore() {
@@ -235,7 +235,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        presenter.destroyView()
+        presenter?.destroyView()
     }
 
     fun setCellMargin(marginPx: Int) {
@@ -246,7 +246,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     fun setItemsPerPage(numItems : Int){
         this.itemsPerPage = numItems
-        presenter.pageLimit = numItems
+        presenter?.pageLimit = numItems
     }
 
     fun setEmptyLayout(@LayoutRes layoutRes : Int){

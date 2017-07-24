@@ -44,31 +44,67 @@ ext{
     butterknife = "8.4.0"
     picasso = "2.5.2"
     constraint = "1.0.0-beta4"
+    espresso = "2.2.2"
+    mockwebserver = '3.4.1'
+    mockito = "2.8.9"
+    mockito_kotlin = "1.4.0"
+    testinjector = '1.0.0'
+    dagger = "2.8"
+    cappucino = "0.9.1"
+
+
+}
+
+// Enable annotations
+kapt {
+    generateStubs = true
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile "com.android.support:appcompat-v7:$support"
     compile "com.android.support:cardview-v7:$support"
-
     testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile project(":library")
-
+    compile project(':library')
     // Constraint Layout
     compile "com.android.support.constraint:constraint-layout:$constraint"
-
     // Butterknife
     compile "com.jakewharton:butterknife:$butterknife"
     kapt "com.jakewharton:butterknife-compiler:$butterknife"
-
     // Picasso
     compile "com.squareup.picasso:picasso:$picasso"
-
     compile 'com.marshalchen.ultimaterecyclerview:library:0.7.0'
+    androidTestCompile "com.android.support:support-annotations:$support"
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile "com.android.support.test.espresso:espresso-core:$espresso"
+    debugCompile "com.metova:cappuccino:$cappucino"
+    releaseCompile "com.metova:cappuccino-no-op:$cappucino"
+    androidTestCompile("com.android.support.test.espresso:espresso-intents:$espresso") {
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'design'
+    }
+    androidTestCompile("com.android.support.test.espresso:espresso-contrib:$espresso") {
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'design'
+    }
+    androidTestCompile "org.mockito:mockito-android:$mockito"
+    androidTestCompile "com.nhaarman:mockito-kotlin:$mockito_kotlin"
+
+    androidTestCompile (project(':injector')) { transitive = false }
+
+    compile "com.google.dagger:dagger:$dagger"
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+    provided 'org.glassfish:javax.annotation:10.0-b28'
+    androidTestCompile 'com.github.fabioCollini:DaggerMock:0.6.6'
 
 
 }

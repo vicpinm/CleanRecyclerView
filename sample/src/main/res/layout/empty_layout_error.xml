@@ -6,6 +6,7 @@
               android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/errorText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Error loading data"/>

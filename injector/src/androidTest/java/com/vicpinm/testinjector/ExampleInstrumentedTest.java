@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview;
+package com.vicpinm.testinjector;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.vicpin.cleanrecyclerview", appContext.getPackageName());
+        assertEquals("com.vicpinm.testinjector.test", appContext.getPackageName());
     }
 }
