@@ -30,7 +30,7 @@ ext {
     support = "25.1.0"
     rx = "1.2.1"
     materialish = "1.7"
-    presenter_adapter = "1.0.6"
+    presenter_adapter = "1.0.7"
     autosubscription = '1.0.1'
 }
 
