@@ -103,6 +103,8 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         loadEmptyLayout()
         loadErrorLayout()
 
+
+
         if(attachedListener != null){
             this.attachedListener?.invoke()
         }
@@ -194,6 +196,10 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             itemDecoration = RecyclerViewMargin(cellMargin, 1, (layoutManager as LinearLayoutManager).orientation)
         }
         recyclerView?.addItemDecoration(itemDecoration)
+    }
+
+    fun reloadData() {
+        presenter?.refreshData()
     }
 
     override fun showProgress() {
