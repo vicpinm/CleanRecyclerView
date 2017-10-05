@@ -61,6 +61,8 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var errorLayout : Int = 0
     private var errorLoadMore : Int = 0
     private var attachedListener : (() -> Unit)? = null
+    private var emptyLayoutShowedListener : (() -> Unit)? = null
+    private var emptyLayoutRemovedListener : (() -> Unit)? = null
 
     constructor(context: Context?) : super(context)
 
@@ -93,6 +95,14 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         else{
             this.attachedListener = listener
         }
+    }
+
+    fun setOnEmptyLayoutShowedListener(listener : () -> Unit){
+        this.emptyLayoutShowedListener = listener
+    }
+
+    fun setOnEmptyLayoutRemovedListener(listener : () -> Unit){
+        this.emptyLayoutRemovedListener = listener
     }
 
     override fun onAttachedToWindow() {
@@ -274,6 +284,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             if (empty?.childCount == 0) {
                 val view = View.inflate(context, emptyLayout, null)
                 empty?.addView(view)
+                emptyLayoutShowedListener?.invoke()
             }
         }
     }
@@ -298,6 +309,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     override fun hideEmptyLayout(){
         empty?.visibility = View.GONE
         emptyError?.visibility = View.GONE
+        emptyLayoutRemovedListener?.invoke()
     }
 
     override fun showLoadMoreError() {
