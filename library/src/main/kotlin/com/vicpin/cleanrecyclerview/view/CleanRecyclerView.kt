@@ -300,6 +300,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     override fun showEmptyLayout() {
         empty?.visibility = View.VISIBLE
+        emptyLayoutShowedListener?.invoke()
     }
 
     override fun showErrorEmptyLayout() {
