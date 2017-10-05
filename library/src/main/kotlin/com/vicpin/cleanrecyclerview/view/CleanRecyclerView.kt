@@ -63,6 +63,8 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var attachedListener : (() -> Unit)? = null
     private var emptyLayoutShowedListener : (() -> Unit)? = null
     private var emptyLayoutRemovedListener : (() -> Unit)? = null
+    private var errorLayoutShowedListener : (() -> Unit)? = null
+    private var errorLayoutRemovedListener : (() -> Unit)? = null
 
     constructor(context: Context?) : super(context)
 
@@ -103,6 +105,14 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     fun setOnEmptyLayoutRemovedListener(listener : () -> Unit){
         this.emptyLayoutRemovedListener = listener
+    }
+
+    fun setOnErrorLayoutShowedListener(listener : () -> Unit){
+        this.errorLayoutShowedListener = listener
+    }
+
+    fun setOnErrorLayoutRemovedListener(listener : () -> Unit){
+        this.errorLayoutRemovedListener = listener
     }
 
     override fun onAttachedToWindow() {
@@ -214,6 +224,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     override fun showProgress() {
         hideEmptyLayout()
+        hideErrorLayout()
         progress?.visibility = View.VISIBLE
     }
 
@@ -294,6 +305,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             if(emptyError?.childCount == 0) {
                 val view = View.inflate(context, errorLayout, null)
                 emptyError?.addView(view)
+                errorLayoutShowedListener?.invoke()
             }
         }
     }
@@ -303,14 +315,19 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         emptyLayoutShowedListener?.invoke()
     }
 
-    override fun showErrorEmptyLayout() {
+    override fun showErrorLayout() {
         emptyError?.visibility = View.VISIBLE
+        errorLayoutShowedListener?.invoke()
     }
 
     override fun hideEmptyLayout(){
         empty?.visibility = View.GONE
-        emptyError?.visibility = View.GONE
         emptyLayoutRemovedListener?.invoke()
+    }
+
+    override fun hideErrorLayout(){
+        emptyError?.visibility = View.GONE
+        errorLayoutRemovedListener?.invoke()
     }
 
     override fun showLoadMoreError() {
