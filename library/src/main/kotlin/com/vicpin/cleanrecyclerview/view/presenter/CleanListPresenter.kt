@@ -2,6 +2,7 @@ package com.vicpin.cleanrecyclerview.view.presenter
 
 import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
+import rx.functions.Action0
 import rx.functions.Action1
 import java.util.*
 
@@ -30,7 +31,9 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
     private fun executeUseCase() {
         dataCase.currentPage = currentPage
-        dataCase.execute(Action1<Pair<CRDataSource,List<Data>>>{ result-> onDataFetched(result.first, result.second)}, Action1<Throwable>{ dataLoadError(it) })
+        dataCase.execute(Action1<Pair<CRDataSource,List<Data>>>{ result-> onDataFetched(result.first, result.second)},
+                Action1<Throwable>{ dataLoadError(it) },
+                Action0{ dataLoadCompleted() })
     }
 
     private fun onDataFetched(source: CRDataSource, data: List<Data>) {
@@ -48,8 +51,15 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
         updateRefreshingWidget(source)
         updateLoadMoreIndicator(source, data.size)
-        hideProgress()
+    }
 
+    private fun dataLoadCompleted() {
+        mView?.hideRefreshing()
+        mView?.hideProgress()
+
+        if(itemsLoadedSize == 0) {
+            showEmptyLayout()
+        }
     }
 
     private fun showEmptyLayout() {

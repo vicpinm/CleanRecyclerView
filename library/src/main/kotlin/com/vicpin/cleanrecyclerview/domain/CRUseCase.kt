@@ -5,6 +5,7 @@ import com.vicpinm.autosubscription.UnsubscribeListener
 import rx.Observable
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
+import rx.functions.Action0
 import rx.functions.Action1
 import rx.schedulers.Schedulers
 
@@ -15,11 +16,13 @@ abstract class CRUseCase<T> : UnsubscribeListener {
 
     private var onNext: Action1<T>? = null
     private var onError: Action1<Throwable>? = null
+    private var onComplete: Action0? = null
     private var subscriber: Subscriber<T>? = null
 
     fun execute() {
         this.onNext = null
         this.onError = null
+        this.onComplete = null
 
         Observable.defer { buildUseCase() }
                 .subscribeOn(Schedulers.io())
@@ -30,10 +33,11 @@ abstract class CRUseCase<T> : UnsubscribeListener {
     }
 
 
-    fun execute(onNextAction: Action1<T>, onErrorAction: Action1<Throwable>) {
+    fun execute(onNext: Action1<T>, onError: Action1<Throwable>, onComplete: Action0) {
 
-        this.onNext = onNextAction
-        this.onError = onErrorAction
+        this.onNext = onNext
+        this.onError = onError
+        this.onComplete = onComplete
 
         Observable.defer { buildUseCase() }
                 .subscribeOn(Schedulers.io())
@@ -53,7 +57,9 @@ abstract class CRUseCase<T> : UnsubscribeListener {
 
         if (subscriber == null) {
             subscriber = object : Subscriber<T>() {
-                override fun onCompleted() {}
+                override fun onCompleted() {
+                    onComplete?.call()
+                }
 
                 override fun onError(e: Throwable) {
                     onError?.call(e)

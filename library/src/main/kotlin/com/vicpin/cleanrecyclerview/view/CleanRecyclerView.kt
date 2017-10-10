@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.support.annotation.LayoutRes
 import android.support.annotation.StringRes
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -19,12 +20,12 @@ import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
-import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.*
 import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenterImpl
+import com.vicpin.cleanrecyclerview.view.util.DividerDecoration
 import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
 import com.vicpin.kpresenteradapter.PresenterAdapter
+import com.vicpin.kpresenteradapter.SingleLinePresenterAdapter
 import com.vicpin.kpresenteradapter.ViewHolder
 import kotlin.reflect.KClass
 
@@ -32,6 +33,7 @@ import kotlin.reflect.KClass
 /**
  * Created by Victor on 20/01/2017.
  */
+
 class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T> {
 
     //public fields
@@ -45,6 +47,15 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             refresh()
         }
 
+    enum class Event {
+        VIEW_LOADED,
+        DATA_LOADED,
+        EMPTY_LAYOUT_SHOWED,
+        EMPTY_LAYOUT_HIDED,
+        ERROR_LAYOUT_SHOWED,
+        ERROR_LAYOUT_HIDED,
+        ON_REFRESH
+    }
 
     //private fields
     private var progress: ProgressWheel? = null
@@ -60,11 +71,11 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var emptyLayout : Int = 0
     private var errorLayout : Int = 0
     private var errorLoadMore : Int = 0
-    private var attachedListener : (() -> Unit)? = null
-    private var emptyLayoutShowedListener : (() -> Unit)? = null
-    private var emptyLayoutRemovedListener : (() -> Unit)? = null
-    private var errorLayoutShowedListener : (() -> Unit)? = null
-    private var errorLayoutRemovedListener : (() -> Unit)? = null
+    private var eventListener : ((Event) -> Unit)? = null
+    private var wrapInCardView = false
+    private var dividerDrawable : Int = 0
+
+
 
     constructor(context: Context?) : super(context)
 
@@ -85,34 +96,18 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             emptyLayout = a?.getResourceId(R.styleable.CleanRecyclerView_emptyLayout, 0) ?: 0
             errorLayout = a?.getResourceId(R.styleable.CleanRecyclerView_errorLayout, 0) ?: 0
             errorLoadMore = a?.getResourceId(R.styleable.CleanRecyclerView_errorLoadMore, 0) ?: 0
+            wrapInCardView = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInCardView, false) ?: false
+            dividerDrawable = a?.getResourceId(R.styleable.CleanRecyclerView_dividerDrawable, 0) ?: 0
         } finally {
             a?.recycle()
         }
     }
 
-    fun setOnAttachedListener(listener : () -> Unit){
-        if(inited){
-            listener()
+    fun setEventListener(listener : (Event) -> Unit) {
+        this.eventListener = listener
+        if (inited) {
+            listener(Event.VIEW_LOADED)
         }
-        else{
-            this.attachedListener = listener
-        }
-    }
-
-    fun setOnEmptyLayoutShowedListener(listener : () -> Unit){
-        this.emptyLayoutShowedListener = listener
-    }
-
-    fun setOnEmptyLayoutRemovedListener(listener : () -> Unit){
-        this.emptyLayoutRemovedListener = listener
-    }
-
-    fun setOnErrorLayoutShowedListener(listener : () -> Unit){
-        this.errorLayoutShowedListener = listener
-    }
-
-    fun setOnErrorLayoutRemovedListener(listener : () -> Unit){
-        this.errorLayoutRemovedListener = listener
     }
 
     override fun onAttachedToWindow() {
@@ -123,15 +118,11 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         loadEmptyLayout()
         loadErrorLayout()
 
-
-
-        if(attachedListener != null){
-            this.attachedListener?.invoke()
-        }
+        this.eventListener?.invoke(Event.VIEW_LOADED)
     }
 
     private fun inflateView() {
-        inflate(context, R.layout.view_cleanrecyclerview, this)
+        inflate(context, if(wrapInCardView) R.layout.view_cleanrecyclerview_cardview else R.layout.view_cleanrecyclerview, this)
         progress = findViewById(R.id.progress) as ProgressWheel
         refresh = findViewById(R.id.refresh) as SwipeRefreshLayout
         empty = findViewById(R.id.empty) as FrameLayout
@@ -139,10 +130,12 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         recyclerView = findViewById(R.id.recyclerListView) as RecyclerView
     }
 
-
-    fun loadPaged(adapter: PresenterAdapter<T>, cloudDataSource: CloudPagedDataSource<T>, cacheDataSource: CacheDataSource<T>) {
+    /**
+     * Load paged methods
+     */
+    fun loadPaged(adapter: PresenterAdapter<T>, cloud: CloudPagedDataSource<T>, cache: CacheDataSource<T> = EmptyCache<T>()) {
         inited = false
-        val repository = PagedListRepository(cacheDataSource, cloudDataSource)
+        val repository = PagedListRepository(cache, cloud)
         val useCase = PagedDataCase(repository)
         presenter = CleanListPresenterImpl(useCase)
         presenter?.mView = this
@@ -151,17 +144,21 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         init()
     }
 
-    fun loadPaged(adapter: PresenterAdapter<T>, cloudDataSource: KClass<out CloudPagedDataSource<T>>, cacheDataSource: KClass<out CacheDataSource<T>>) {
-        loadPaged(adapter, cloudDataSource.java, cacheDataSource.java)
+    fun loadPaged(adapter: PresenterAdapter<T>, cloud: KClass<out CloudPagedDataSource<T>>, cache: KClass<out CacheDataSource<T>>? = null) {
+        loadPaged(adapter, cloud.java, cache?.java)
     }
 
-    fun loadPaged(adapter: PresenterAdapter<T>, cloudDataSource: Class<out CloudPagedDataSource<T>>, cacheDataSource: Class<out CacheDataSource<T>>) {
-        loadPaged(adapter, cloudDataSource.newInstance(), cacheDataSource.newInstance())
+
+    fun loadPaged(adapter: PresenterAdapter<T>, cloud: Class<out CloudPagedDataSource<T>>, cache: Class<out CacheDataSource<T>>? = null) {
+        loadPaged(adapter, cloud.newInstance(), cache?.newInstance() ?: EmptyCache<T>())
     }
 
-    fun load(adapter: PresenterAdapter<T>, cloudDataSource: CloudDataSource<T>, cacheDataSource: CacheDataSource<T>) {
+    /**
+     * Load methods with no pagination
+     */
+    fun load(adapter: PresenterAdapter<T>, cloud: CloudDataSource<T> = EmptyCloud<T>(), cache: CacheDataSource<T> = EmptyCache()) {
         inited = false
-        val repository = ListRepository(cacheDataSource, cloudDataSource)
+        val repository = ListRepository(cache, cloud)
         val useCase = PagedDataCase(repository)
         presenter = CleanListPresenterImpl(useCase)
         presenter?.mView = this
@@ -170,13 +167,19 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         init(paged = false)
     }
 
-    fun load(adapter: PresenterAdapter<T>, cloudDataSource: KClass<out CloudDataSource<T>>, cacheDataSource: KClass<out CacheDataSource<T>>) {
-        load(adapter, cloudDataSource.java, cacheDataSource.java)
+    fun loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudDataSource<T> = EmptyCloud<T>(), cache: CacheDataSource<T> = EmptyCache<T>()) {
+        load(SingleLinePresenterAdapter<T>(layoutResId), cloud, cache)
     }
 
-    fun load(adapter: PresenterAdapter<T>, cloudDataSource: Class<out CloudDataSource<T>>, cacheDataSource: Class<out CacheDataSource<T>>) {
-        load(adapter, cloudDataSource.newInstance(), cacheDataSource.newInstance())
+
+    fun load(adapter: PresenterAdapter<T>, cloud: KClass<out CloudDataSource<T>>? = null, cache: KClass<out CacheDataSource<T>>? = null) {
+        load(adapter, cloud?.java, cache?.java)
     }
+
+    fun load(adapter: PresenterAdapter<T>, cloud: Class<out CloudDataSource<T>>? = null, cache: Class<out CacheDataSource<T>>? = null) {
+        load(adapter, cloud?.newInstance() ?: EmptyCloud<T>(), cache?.newInstance() ?: EmptyCache<T>())
+    }
+
 
     private fun init(paged : Boolean = true) {
         if (!inited && isAttached && adapter != null) {
@@ -204,7 +207,10 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         recyclerView?.layoutManager = layoutManager
         recyclerView?.adapter = adapter
         updateDecoration()
-        refresh?.setOnRefreshListener { presenter?.refreshData() }
+        refresh?.setOnRefreshListener {
+            presenter?.refreshData()
+            eventListener?.invoke(Event.ON_REFRESH)
+        }
     }
 
     private fun updateDecoration(){
@@ -216,6 +222,12 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             itemDecoration = RecyclerViewMargin(cellMargin, 1, (layoutManager as LinearLayoutManager).orientation)
         }
         recyclerView?.addItemDecoration(itemDecoration)
+
+        if(dividerDrawable > 0 && layoutManager is LinearLayoutManager) {
+            val divider = DividerDecoration(context, (layoutManager as LinearLayoutManager).orientation)
+            divider.setDrawable(ContextCompat.getDrawable(context, dividerDrawable))
+            recyclerView?.addItemDecoration(divider)
+        }
     }
 
     fun reloadData() {
@@ -238,6 +250,9 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     override fun setData(data: List<T>) {
         adapter?.setData(data)
+        if(data.isNotEmpty()) {
+            eventListener?.invoke(Event.DATA_LOADED)
+        }
     }
 
     override fun showLoadMore() {
@@ -295,7 +310,6 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             if (empty?.childCount == 0) {
                 val view = View.inflate(context, emptyLayout, null)
                 empty?.addView(view)
-                emptyLayoutShowedListener?.invoke()
             }
         }
     }
@@ -305,29 +319,28 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             if(emptyError?.childCount == 0) {
                 val view = View.inflate(context, errorLayout, null)
                 emptyError?.addView(view)
-                errorLayoutShowedListener?.invoke()
             }
         }
     }
 
     override fun showEmptyLayout() {
         empty?.visibility = View.VISIBLE
-        emptyLayoutShowedListener?.invoke()
+        eventListener?.invoke(Event.EMPTY_LAYOUT_SHOWED)
     }
 
     override fun showErrorLayout() {
         emptyError?.visibility = View.VISIBLE
-        errorLayoutShowedListener?.invoke()
+        eventListener?.invoke(Event.ERROR_LAYOUT_SHOWED)
     }
 
     override fun hideEmptyLayout(){
         empty?.visibility = View.GONE
-        emptyLayoutRemovedListener?.invoke()
+        eventListener?.invoke(Event.EMPTY_LAYOUT_HIDED)
     }
 
     override fun hideErrorLayout(){
         emptyError?.visibility = View.GONE
-        errorLayoutRemovedListener?.invoke()
+        eventListener?.invoke(Event.ERROR_LAYOUT_HIDED)
     }
 
     override fun showLoadMoreError() {
