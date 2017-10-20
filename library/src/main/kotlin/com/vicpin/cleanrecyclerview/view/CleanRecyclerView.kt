@@ -234,6 +234,10 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         presenter?.refreshData()
     }
 
+    fun reloadCache() {
+        presenter?.refreshCache()
+    }
+
     override fun showProgress() {
         hideEmptyLayout()
         hideErrorLayout()

@@ -1,6 +1,5 @@
 package com.vicpin.cleanrecyclerview.domain
 
-import com.vicpin.cleanrecyclerview.domain.CRUseCase
 import com.vicpin.cleanrecyclerview.repository.IRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 
@@ -11,8 +10,9 @@ class PagedDataCase<T>
 constructor(val repository: IRepository<T>) : CRUseCase<Pair<CRDataSource, List<T>>>() {
 
     var currentPage: Int = 0
+    var onlyDisk = false
 
-    override fun buildUseCase() = repository.getData(currentPage)
+    override fun buildUseCase() = if(onlyDisk) repository.getDataFromDisk() else repository.getData(currentPage)
 
 }
 

@@ -22,10 +22,11 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         hideLoadMore()
     }
 
-    fun fetchData(fromRefresh : Boolean = false) {
+    fun fetchData(fromRefresh : Boolean = false, onlyDisk : Boolean = false) {
         if(!fromRefresh) {
             showProgress()
         }
+        dataCase.onlyDisk = onlyDisk
         executeUseCase()
     }
 
@@ -37,6 +38,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     }
 
     private fun onDataFetched(source: CRDataSource, data: List<Data>) {
+
         itemsLoadedSize += data.size
 
         if (data.isNotEmpty()) {
@@ -70,7 +72,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     private fun updateRefreshingWidget(source : CRDataSource){
 
         if (currentPage == 0) {
-            if (source == CRDataSource.DISK && itemsLoadedSize > 0) {
+            if (source == CRDataSource.DISK && itemsLoadedSize > 0 && !dataCase.onlyDisk) {
                 mView?.showRefreshing()
             } else if(source == CRDataSource.CLOUD){
                 mView?.hideRefreshing()
@@ -154,6 +156,11 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     fun refreshData() {
         init()
         fetchData(fromRefresh = true)
+    }
+
+    fun refreshCache() {
+        init()
+        fetchData(fromRefresh = true, onlyDisk = true)
     }
 
     abstract val dataCase: PagedDataCase<Data>
