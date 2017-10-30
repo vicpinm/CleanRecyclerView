@@ -83,6 +83,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     private fun loadDataIntoView(data : List<Data>){
         mView?.hideEmptyLayout()
         mView?.hideErrorLayout()
+        hideProgress()
 
         if (currentPage == 0) {
             mView?.setData(data)
