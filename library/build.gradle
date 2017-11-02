@@ -28,10 +28,9 @@ android {
 
 ext {
     support = "25.1.0"
-    rx = "1.2.1"
     materialish = "1.7"
     presenter_adapter = "1.0.9"
-    autosubscription = '1.0.1'
+    autosubscription = '1.0.2'
 }
 
 dependencies {
@@ -49,8 +48,8 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$support"
 
     // Rx Android
-    compile "io.reactivex:rxandroid:$rx"
-    compile "io.reactivex:rxjava:$rx"
+    compile 'io.reactivex.rxjava2:rxjava:2.1.4'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
     // Materialish
     compile "com.pnikosis:materialish-progress:$materialish"

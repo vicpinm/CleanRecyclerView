@@ -1,6 +1,6 @@
 package com.vicpin.cleanrecyclerview.repository.datasource
 
-import rx.Observable
+import io.reactivex.Flowable
 import java.util.*
 
 /**
@@ -8,7 +8,7 @@ import java.util.*
  */
 class EmptyCache<T> : CacheDataSource<T> {
 
-    override fun getData() = Observable.just(Collections.emptyList<T>())
+    override fun getData() = Flowable.just(Collections.emptyList<T>())
 
     override fun clearData() {}
 

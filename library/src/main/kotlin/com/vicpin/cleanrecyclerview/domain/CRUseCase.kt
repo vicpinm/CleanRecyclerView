@@ -2,83 +2,73 @@ package com.vicpin.cleanrecyclerview.domain
 
 
 import com.vicpinm.autosubscription.UnsubscribeListener
-import rx.Observable
-import rx.Subscriber
-import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action0
-import rx.functions.Action1
-import rx.schedulers.Schedulers
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subscribers.DisposableSubscriber
+
 
 /**
  * Created by Victor on 20/01/2017.
  */
 abstract class CRUseCase<T> : UnsubscribeListener {
 
-    private var onNext: Action1<T>? = null
-    private var onError: Action1<Throwable>? = null
-    private var onComplete: Action0? = null
-    private var subscriber: Subscriber<T>? = null
-
-    fun execute() {
-        this.onNext = null
-        this.onError = null
-        this.onComplete = null
-
-        Observable.defer { buildUseCase() }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError { it.printStackTrace() }
-                .subscribe(getSubscriber())
-
-    }
+    private var onNext: ((T) -> Unit)? = null
+    private var onError: ((Throwable) -> Unit)? = null
+    private var onComplete: (() -> Unit)? = null
+    private var subscriber: DisposableSubscriber<T>? = null
 
 
-    fun execute(onNext: Action1<T>, onError: Action1<Throwable>, onComplete: Action0) {
+    fun execute(onNext: ((T) -> Unit)?  = null, onError: ((Throwable) -> Unit)?  = null, onComplete: (() -> Unit)? = null) {
+
+        if(subscriber != null){
+            unsubscribe() //Unsubscribe previous subscription
+        }
 
         this.onNext = onNext
         this.onError = onError
         this.onComplete = onComplete
 
-        Observable.defer { buildUseCase() }
+        Flowable.defer { buildUseCase() }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError { it.printStackTrace() }
                 .subscribe(getSubscriber())
+
     }
 
 
-    abstract fun buildUseCase(): Observable<T>
+    abstract fun buildUseCase(): Flowable<T>
 
-    fun getSubscriber(): Subscriber<T> {
+    fun getSubscriber(): DisposableSubscriber<T> {
 
-        if (subscriber != null && subscriber!!.isUnsubscribed) {
+        if (subscriber != null && subscriber!!.isDisposed) {
             subscriber = null
         }
 
         if (subscriber == null) {
-            subscriber = object : Subscriber<T>() {
-                override fun onCompleted() {
-                    onComplete?.call()
+            subscriber = object : DisposableSubscriber<T>() {
+                override fun onComplete() {
+                    onComplete?.invoke()
                 }
 
                 override fun onError(e: Throwable) {
-                    onError?.call(e)
+                    onError?.invoke(e)
 
                 }
 
                 override fun onNext(t: T) {
-                    onNext?.call(t)
-
+                    onNext?.invoke(t)
                 }
             }
         }
 
-        return subscriber as Subscriber<T>
+        return subscriber!!
     }
 
     fun unsubscribe() {
         try {
-            subscriber?.unsubscribe()
+            subscriber?.dispose()
         } catch (ex: Exception) {
             ex.printStackTrace()
         }

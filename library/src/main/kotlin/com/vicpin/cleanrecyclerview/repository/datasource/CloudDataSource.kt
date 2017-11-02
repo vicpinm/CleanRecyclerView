@@ -1,11 +1,11 @@
 package com.vicpin.cleanrecyclerview.repository.datasource
 
-import rx.Observable
+import io.reactivex.Single
 
 /**
  * Created by Victor on 20/01/2017.
  */
 interface CloudDataSource<T> {
 
-    fun getData(): Observable<List<T>>
+    fun getData(): Single<List<T>>
 }
