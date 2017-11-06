@@ -123,11 +123,11 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
 
     private fun inflateView() {
         inflate(context, if(wrapInCardView) R.layout.view_cleanrecyclerview_cardview else R.layout.view_cleanrecyclerview, this)
-        progress = findViewById(R.id.progress) as ProgressWheel
-        refresh = findViewById(R.id.refresh) as SwipeRefreshLayout
-        empty = findViewById(R.id.empty) as FrameLayout
-        emptyError = findViewById(R.id.emptyError) as FrameLayout
-        recyclerView = findViewById(R.id.recyclerListView) as RecyclerView
+        progress = findViewById(R.id.progress)
+        refresh = findViewById(R.id.refresh)
+        empty = findViewById(R.id.empty)
+        emptyError = findViewById(R.id.emptyError)
+        recyclerView = findViewById(R.id.recyclerListView)
     }
 
     /**

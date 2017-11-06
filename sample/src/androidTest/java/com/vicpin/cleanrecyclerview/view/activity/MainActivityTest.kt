@@ -21,13 +21,13 @@ import com.vicpin.cleanrecyclerview.sample.di.AppComponent
 import com.vicpin.cleanrecyclerview.sample.di.AppModule
 import com.vicpin.cleanrecyclerview.sample.view.activity.MainActivity
 import com.vicpin.cleanrecyclerview.util.TestUtils.*
+import io.reactivex.Single
 import it.cosenonjaviste.daggermock.DaggerMockRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Spy
-import rx.Observable
 
 
 
@@ -85,14 +85,14 @@ class MainActivityTest {
 
     @Test
     fun testErrorTextIsVisibleWhenServiceReturnsError(){
-        whenever(mPagedService.getData(any())).thenReturn(Observable.error(Throwable()))
+        whenever(mPagedService.getData(any())).thenReturn(Single.error(Throwable()))
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.errorText)).check(matches(isDisplayed()))
     }
 
     @Test
     fun testEmptyTextIsVisibleWhenServiceReturnsNoData(){
-        whenever(mPagedService.getData(any())).thenReturn(Observable.just(listOf()))
+        whenever(mPagedService.getData(any())).thenReturn(Single.just(listOf()))
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.emptyText)).check(matches(isDisplayed()))
     }
@@ -106,7 +106,7 @@ class MainActivityTest {
 
     @Test
     fun testErrorTextIsVisibleWhenNoPagedAndServiceReturnsError(){
-        whenever(mNoPagedService.getData()).thenReturn(Observable.error(Throwable()))
+        whenever(mNoPagedService.getData()).thenReturn(Single.error(Throwable()))
         mActivityRule.launchActivity(Intent())
         mCache.clearData()
         onView(withId(R.id.paginated)).perform(click())
@@ -115,7 +115,7 @@ class MainActivityTest {
 
     @Test
     fun testEmptyTextIsVisibleWhenNoPagedAndServiceReturnsNoData(){
-        whenever(mNoPagedService.getData()).thenReturn(Observable.just(listOf()))
+        whenever(mNoPagedService.getData()).thenReturn(Single.just(listOf()))
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.paginated)).perform(click())
         onView(withId(R.id.emptyText)).check(matches(isDisplayed()))
