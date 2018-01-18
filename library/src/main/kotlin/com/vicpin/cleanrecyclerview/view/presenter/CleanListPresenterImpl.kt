@@ -1,6 +1,5 @@
 package com.vicpin.cleanrecyclerview.view.presenter
 
-import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenter
 import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpinm.autosubscription.Unsubscriber
 import com.vicpinm.autosubscription.anotations.AutoSubscription
@@ -9,12 +8,12 @@ import com.vicpinm.autosubscription.anotations.AutoSubscription
  * Created by Victor on 20/01/2017.
  */
 class CleanListPresenterImpl<T>
-constructor(mUseCase : PagedDataCase<T>) : CleanListPresenter<T, CleanListPresenterImpl.View<T>>() {
+constructor(mUseCase: PagedDataCase<T>) : CleanListPresenter<T, CleanListPresenterImpl.View<T>>() {
 
     @AutoSubscription override val dataCase = mUseCase
     override var pageLimit = 0
 
-    fun destroyView(){
+    fun destroyView() {
         Unsubscriber.unlink(this)
     }
 
@@ -39,6 +38,7 @@ constructor(mUseCase : PagedDataCase<T>) : CleanListPresenter<T, CleanListPresen
 
         override fun hideEmptyLayout()
 
+        override fun notifyConnectionError()
     }
 
 

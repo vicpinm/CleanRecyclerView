@@ -8,7 +8,7 @@ import android.view.View
 /**
  * Created by Victor on 20/01/2017.
  */
-class RecyclerViewMargin(val margin: Int, val columns : Int = 1, val orientation : Int = LinearLayoutManager.VERTICAL) : RecyclerView.ItemDecoration() {
+class RecyclerViewMargin(private val margin: Int, private val columns : Int = 1, val orientation : Int = LinearLayoutManager.VERTICAL) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect, view: View,
                                 parent: RecyclerView, state: RecyclerView.State?) {

@@ -24,10 +24,13 @@ interface ICleanRecyclerView<T> {
 
     fun hideEmptyLayout()
 
+    fun emptyDataWithHeader()
+
     fun showErrorLayout()
 
     fun showLoadMoreError()
 
     fun hideErrorLayout()
 
+    fun notifyConnectionError()
 }

@@ -4,7 +4,6 @@ import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import java.util.*
 
-
 /**
  * Created by Victor on 20/01/2017.
  */
@@ -13,15 +12,28 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     var mView: View? = null
     protected var itemsLoadedSize = 0
     protected var currentPage = 0
-    private var isShowingLoadMore = false;
+    private var isShowingLoadMore = false
+    private var isEnabledPullRefresh = false
+    private var headerContainsItems = false
 
-    fun init(){
+    fun init() {
         currentPage = 0
         hideLoadMore()
     }
 
-    fun fetchData(fromRefresh : Boolean = false, onlyDisk : Boolean = false) {
-        if(!fromRefresh) {
+    fun setEnabledLoading(enabledPullRefresh: Boolean) {
+        isEnabledPullRefresh = enabledPullRefresh
+    }
+
+    /**
+     * Cuando se muestre un placeholder es necesario comprobar si la lista tiene cabecera para que no se superponga
+     */
+    fun setHeaderContainsItems(containsItems: Boolean) {
+        this.headerContainsItems = containsItems
+    }
+
+    fun fetchData(fromRefresh: Boolean = false, onlyDisk: Boolean = false) {
+        if (!fromRefresh) {
             showProgress()
         }
         dataCase.onlyDisk = onlyDisk
@@ -30,7 +42,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
     private fun executeUseCase() {
         dataCase.currentPage = currentPage
-        dataCase.execute({ result-> onDataFetched(result.first, result.second)},
+        dataCase.execute({ result -> onDataFetched(result.first, result.second) },
                 { dataLoadError(it) },
                 { dataLoadCompleted() })
     }
@@ -41,10 +53,9 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
 
         if (data.isNotEmpty()) {
             loadDataIntoView(data)
-        }
-        else if(currentPage == 0){
+        } else if (currentPage == 0) {
             clearDataFromView()
-            if(source == CRDataSource.CLOUD){
+            if (source == CRDataSource.CLOUD) {
                 showEmptyLayout()
             }
         }
@@ -57,28 +68,39 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         mView?.hideRefreshing()
         mView?.hideProgress()
 
-        if(itemsLoadedSize == 0) {
+        if (itemsLoadedSize == 0) {
             showEmptyLayout()
         }
     }
 
     private fun showEmptyLayout() {
-        mView?.showEmptyLayout()
-        mView?.hideProgress()
+        mView?.apply {
+            hideErrorLayout()
+            if (headerContainsItems) {
+                hideEmptyLayout()
+            } else {
+                showEmptyLayout()
+                hideProgress()
+            }
+        }
     }
 
-    private fun updateRefreshingWidget(source : CRDataSource){
+    private fun updateRefreshingWidget(source: CRDataSource) {
 
         if (currentPage == 0) {
             if (source == CRDataSource.DISK && itemsLoadedSize > 0 && !dataCase.onlyDisk) {
-                mView?.showRefreshing()
-            } else if(source == CRDataSource.CLOUD){
+                if (isEnabledPullRefresh) {
+                    mView?.showRefreshing()
+                } else {
+                    mView?.hideRefreshing()
+                }
+            } else if (source == CRDataSource.CLOUD) {
                 mView?.hideRefreshing()
             }
         }
     }
 
-    private fun loadDataIntoView(data : List<Data>){
+    private fun loadDataIntoView(data: List<Data>) {
         mView?.hideEmptyLayout()
         mView?.hideErrorLayout()
         hideProgress()
@@ -90,7 +112,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         }
     }
 
-    private fun clearDataFromView(){
+    private fun clearDataFromView() {
         mView?.setData(ArrayList<Data>())
         itemsLoadedSize = 0
     }
@@ -109,8 +131,6 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         }
     }
 
-
-
     private fun showProgress() {
         if (itemsLoadedSize == 0) {
             mView?.showProgress()
@@ -123,25 +143,28 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         }
     }
 
-    private fun hideLoadMore(){
+    private fun hideLoadMore() {
         isShowingLoadMore = false
         mView?.hideLoadMore()
     }
 
     private fun dataLoadError(ex: Throwable) {
+        mView?.notifyConnectionError()
         mView?.hideProgress()
         mView?.hideRefreshing()
         mView?.hideEmptyLayout()
         mView?.hideErrorLayout()
 
-        if(isShowingLoadMore){
+        if (isShowingLoadMore) {
             mView?.showLoadMoreError()
         }
 
         hideLoadMore()
 
-        if(itemsLoadedSize == 0) {
-            mView?.showErrorLayout()
+        if (itemsLoadedSize == 0) {
+            if (!headerContainsItems) {
+                mView?.showErrorLayout()
+            }
         }
 
         ex.printStackTrace()
@@ -152,9 +175,9 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         fetchData()
     }
 
-    fun refreshData() {
+    fun refreshData(fromRefresh: Boolean) {
         init()
-        fetchData(fromRefresh = true)
+        fetchData(fromRefresh)
     }
 
     fun refreshCache() {
