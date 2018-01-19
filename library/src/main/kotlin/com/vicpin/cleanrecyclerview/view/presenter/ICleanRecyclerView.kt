@@ -30,4 +30,5 @@ interface ICleanRecyclerView<T> {
 
     fun hideErrorLayout()
 
+    fun notifyConnectionError()
 }

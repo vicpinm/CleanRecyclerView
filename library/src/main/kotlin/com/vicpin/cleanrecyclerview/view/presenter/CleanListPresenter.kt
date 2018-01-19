@@ -130,6 +130,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     }
 
     private fun dataLoadError(ex: Throwable) {
+        mView?.notifyConnectionError()
         mView?.hideProgress()
         mView?.hideRefreshing()
         mView?.hideEmptyLayout()
