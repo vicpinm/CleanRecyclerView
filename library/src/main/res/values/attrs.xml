@@ -8,5 +8,6 @@
         <attr name="errorLoadMore" format="string" />
         <attr name="wrapInCardView" format="boolean" />
         <attr name="dividerDrawable" format="reference" />
+        <attr name="refreshEnabled" format="boolean" />
     </declare-styleable>
 </resources>

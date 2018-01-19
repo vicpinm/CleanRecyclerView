@@ -74,7 +74,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var eventListener : ((Event) -> Unit)? = null
     private var wrapInCardView = false
     private var dividerDrawable : Int = 0
-
+    private var refreshEnabled = false
 
 
     constructor(context: Context?) : super(context)
@@ -98,6 +98,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             errorLoadMore = a?.getResourceId(R.styleable.CleanRecyclerView_errorLoadMore, 0) ?: 0
             wrapInCardView = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInCardView, false) ?: false
             dividerDrawable = a?.getResourceId(R.styleable.CleanRecyclerView_dividerDrawable, 0) ?: 0
+            refreshEnabled = a?.getBoolean(R.styleable.CleanRecyclerView_refreshEnabled, true) ?: true
         } finally {
             a?.recycle()
         }
@@ -211,6 +212,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
             presenter?.refreshData()
             eventListener?.invoke(Event.ON_REFRESH)
         }
+        setRefreshEnabled(refreshEnabled)
     }
 
     private fun updateDecoration(){
@@ -268,11 +270,18 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     }
 
     override fun showRefreshing() {
-        refresh?.isRefreshing = true
+        if(refreshEnabled) {
+            refresh?.isRefreshing = true
+        }
     }
 
     override fun hideRefreshing() {
         refresh?.isRefreshing = false
+    }
+
+    fun setRefreshEnabled(enabled : Boolean) {
+        refreshEnabled = enabled
+        refresh?.isEnabled = enabled
     }
 
     fun onItemClick(listener: ((T, ViewHolder<T>) -> Unit)) {
