@@ -63,6 +63,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     }
 
     private fun showEmptyLayout() {
+        mView?.hideErrorLayout()
         mView?.showEmptyLayout()
         mView?.hideProgress()
     }
