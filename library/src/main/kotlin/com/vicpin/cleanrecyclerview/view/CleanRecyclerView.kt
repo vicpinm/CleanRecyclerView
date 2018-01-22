@@ -260,6 +260,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     }
 
     override fun hideLoadMore() {
+        adapter?.loadMoreListener = null
         Handler().postDelayed({ adapter?.disableLoadMore() }, 100)
     }
 
