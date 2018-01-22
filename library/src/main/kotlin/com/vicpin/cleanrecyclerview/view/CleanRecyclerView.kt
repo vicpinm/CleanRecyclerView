@@ -21,6 +21,7 @@ import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.*
+import com.vicpin.cleanrecyclerview.view.interfaces.Mapper
 import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenterImpl
 import com.vicpin.cleanrecyclerview.view.util.DividerDecoration
 import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
@@ -33,7 +34,7 @@ import kotlin.reflect.KClass
  * Created by Victor on 20/01/2017.
  */
 
-class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T> {
+open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayout, CleanListPresenterImpl.View<ViewEntity> {
 
     //public fields
     var refresh: SwipeRefreshLayout? = null
@@ -61,9 +62,9 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     private var progress: ProgressWheel? = null
     private var empty: FrameLayout? = null
     private var emptyError: FrameLayout? = null
-    private var adapter: PresenterAdapter<T>? = null
-    private var presenter: CleanListPresenterImpl<T>? = null
-    private var clickListener: ((T, ViewHolder<T>) -> Unit)? = null
+    private var adapter: PresenterAdapter<ViewEntity>? = null
+    private var presenter: CleanListPresenterImpl<ViewEntity, DataEntity>? = null
+    private var clickListener: ((ViewEntity, ViewHolder<ViewEntity>) -> Unit)? = null
     private var inited = false
     private var isAttached = false
     private var itemsPerPage = 0
@@ -133,10 +134,10 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
     /**
      * Load paged methods
      */
-    fun loadPaged(adapter: PresenterAdapter<T>, cloud: CloudPagedDataSource<T>, cache: CacheDataSource<T> = EmptyCache<T>()) {
+    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: CloudPagedDataSource<DataEntity>, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
         inited = false
         val repository = PagedListRepository(cache, cloud)
-        val useCase = PagedDataCase(repository)
+        val useCase = PagedDataCase(repository, mapper)
         presenter = CleanListPresenterImpl(useCase)
         presenter?.mView = this
         this.adapter = adapter
@@ -144,21 +145,21 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         init()
     }
 
-    fun loadPaged(adapter: PresenterAdapter<T>, cloud: KClass<out CloudPagedDataSource<T>>, cache: KClass<out CacheDataSource<T>>? = null) {
-        loadPaged(adapter, cloud.java, cache?.java)
+    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out CloudPagedDataSource<DataEntity>>, cache: KClass<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+        loadPaged(adapter, cloud.java, cache?.java, mapper)
     }
 
-    fun loadPaged(adapter: PresenterAdapter<T>, cloud: Class<out CloudPagedDataSource<T>>, cache: Class<out CacheDataSource<T>>? = null) {
-        loadPaged(adapter, cloud.newInstance(), cache?.newInstance() ?: EmptyCache<T>())
+    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudPagedDataSource<DataEntity>>, cache: Class<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+        loadPaged(adapter, cloud.newInstance(), cache?.newInstance() ?: EmptyCache(), mapper)
     }
 
     /**
      * Load methods with no pagination
      */
-    fun load(adapter: PresenterAdapter<T>, cloud: CloudDataSource<T> = EmptyCloud<T>(), cache: CacheDataSource<T> = EmptyCache()) {
+    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudDataSource<DataEntity> = EmptyCloud(), cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
         inited = false
         val repository = ListRepository(cache, cloud)
-        val useCase = PagedDataCase(repository)
+        val useCase = PagedDataCase(repository, mapper)
         presenter = CleanListPresenterImpl(useCase)
         presenter?.mView = this
         this.adapter = adapter
@@ -166,16 +167,16 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         init(paged = false)
     }
 
-    fun loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudDataSource<T> = EmptyCloud<T>(), cache: CacheDataSource<T> = EmptyCache<T>()) {
-        load(SingleLinePresenterAdapter<T>(layoutResId), cloud, cache)
+    fun loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudDataSource<DataEntity> = EmptyCloud(), cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
+        load(SingleLinePresenterAdapter(layoutResId), cloud, cache, mapper)
     }
 
-    fun load(adapter: PresenterAdapter<T>, cloud: KClass<out CloudDataSource<T>>? = null, cache: KClass<out CacheDataSource<T>>? = null) {
-        load(adapter, cloud?.java, cache?.java)
+    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out CloudDataSource<DataEntity>>? = null, cache: KClass<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+        load(adapter, cloud?.java, cache?.java, mapper)
     }
 
-    fun load(adapter: PresenterAdapter<T>, cloud: Class<out CloudDataSource<T>>? = null, cache: Class<out CacheDataSource<T>>? = null) {
-        load(adapter, cloud?.newInstance() ?: EmptyCloud<T>(), cache?.newInstance() ?: EmptyCache<T>())
+    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudDataSource<DataEntity>>? = null, cache: Class<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+        load(adapter, cloud?.newInstance() ?: EmptyCloud(), cache?.newInstance() ?: EmptyCache(), mapper)
     }
 
     private fun init(paged: Boolean = true) {
@@ -244,11 +245,11 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         progress?.visibility = View.GONE
     }
 
-    override fun addData(data: List<T>) {
+    override fun addData(data: List<ViewEntity>) {
         adapter?.addData(data)
     }
 
-    override fun setData(data: List<T>) {
+    override fun setData(data: List<ViewEntity>) {
         adapter?.setData(data)
         if (data.isNotEmpty()) {
             eventListener?.invoke(Event.DATA_LOADED)
@@ -279,7 +280,7 @@ class CleanRecyclerView<T : Any> : RelativeLayout, CleanListPresenterImpl.View<T
         refresh?.isEnabled = enabled
     }
 
-    fun onItemClick(listener: ((T, ViewHolder<T>) -> Unit)) {
+    fun onItemClick(listener: ((ViewEntity, ViewHolder<ViewEntity>) -> Unit)) {
         this.clickListener = listener
     }
 

@@ -8,12 +8,12 @@ import java.util.*
 /**
  * Created by Victor on 20/01/2017.
  */
-abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
+abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerView<ViewEntity>> {
 
     var mView: View? = null
     protected var itemsLoadedSize = 0
     protected var currentPage = 0
-    private var isShowingLoadMore = false;
+    private var isShowingLoadMore = false
 
     fun init(){
         currentPage = 0
@@ -35,8 +35,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
                 { dataLoadCompleted() })
     }
 
-    private fun onDataFetched(source: CRDataSource, data: List<Data>) {
-
+    private fun onDataFetched(source: CRDataSource, data: List<ViewEntity>) {
         itemsLoadedSize += data.size
 
         if (data.isNotEmpty()) {
@@ -79,7 +78,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         }
     }
 
-    private fun loadDataIntoView(data : List<Data>){
+    private fun loadDataIntoView(data : List<ViewEntity>){
         mView?.hideEmptyLayout()
         mView?.hideErrorLayout()
         hideProgress()
@@ -92,7 +91,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
     }
 
     private fun clearDataFromView(){
-        mView?.setData(ArrayList<Data>())
+        mView?.setData(ArrayList<ViewEntity>())
         itemsLoadedSize = 0
     }
 
@@ -164,7 +163,7 @@ abstract class CleanListPresenter<Data, View : ICleanRecyclerView<Data>> {
         fetchData(fromRefresh = true, onlyDisk = true)
     }
 
-    abstract val dataCase: PagedDataCase<Data>
+    abstract val dataCase: PagedDataCase<ViewEntity, DataEntity>
 
     abstract val pageLimit: Int
 

@@ -13,7 +13,7 @@ import com.vicpin.cleanrecyclerview.sample.data.ItemService
 import com.vicpin.cleanrecyclerview.sample.extensions.injector
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import com.vicpin.cleanrecyclerview.sample.view.adapter.AdapterItemView
-import com.vicpin.cleanrecyclerview.view.CleanRecyclerView
+import com.vicpin.cleanrecyclerview.view.SimpleCleanRecyclerView
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         paginated = true
         menuItem?.title = getString(R.string.no_paginated)
 
-        val cleanRecyclerView = list as CleanRecyclerView<Item>
+        val cleanRecyclerView = list as SimpleCleanRecyclerView<Item>
         val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
         cleanRecyclerView.loadPaged(adapter, pagedService, itemCache)
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         paginated = false
         menuItem?.title = getString(R.string.paginated)
 
-        val cleanRecyclerView = list as CleanRecyclerView<Item>
+        val cleanRecyclerView = list as SimpleCleanRecyclerView<Item>
         val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
         cleanRecyclerView.load(adapter, noPagedService, itemCache)
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        val cleanRecyclerView = list as CleanRecyclerView<Item>
+        val cleanRecyclerView = list as SimpleCleanRecyclerView<Item>
 
         when(item?.itemId){
             R.id.paginated -> if(paginated) initNoPagedList() else initPagedList()
