@@ -31,4 +31,8 @@ interface ICleanRecyclerView<T> {
     fun hideErrorLayout()
 
     fun notifyConnectionError()
+
+    fun hasHeaders() : Boolean
+
+    fun showHeaderIfEmptyList(): Boolean
 }

@@ -63,7 +63,9 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
 
     private fun showEmptyLayout() {
         mView?.hideErrorLayout()
-        mView?.showEmptyLayout()
+        if(mView?.hasHeaders() == false || mView?.showHeaderIfEmptyList() == false) {
+            mView?.showEmptyLayout()
+        }
         mView?.hideProgress()
     }
 

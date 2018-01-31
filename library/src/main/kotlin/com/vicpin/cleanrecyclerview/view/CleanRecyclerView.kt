@@ -76,6 +76,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var wrapInCardView = false
     private var dividerDrawable: Int = 0
     private var refreshEnabled = false
+    private var showHeaderIfEmptyList = false
 
     constructor(context: Context?) : super(context)
 
@@ -99,6 +100,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             wrapInCardView = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInCardView, false) ?: false
             dividerDrawable = a?.getResourceId(R.styleable.CleanRecyclerView_dividerDrawable, 0) ?: 0
             refreshEnabled = a?.getBoolean(R.styleable.CleanRecyclerView_refreshEnabled, true) ?: true
+            showHeaderIfEmptyList = a?.getBoolean(R.styleable.CleanRecyclerView_showHeaderIfEmptyList, false) ?: false
         } finally {
             a?.recycle()
         }
@@ -314,6 +316,10 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         this.errorLoadMore = stringRes
     }
 
+    fun setShowHeaderIfEmptyList(showHeader: Boolean) {
+        this.showHeaderIfEmptyList = showHeader
+    }
+
     fun loadEmptyLayout() {
         if (emptyLayout > 0) {
             if (empty?.childCount == 0) {
@@ -374,4 +380,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             }
         })
     }
+
+    override fun hasHeaders() = if(adapter != null) adapter!!.getHeadersCount() > 0 else false
+
+    override fun showHeaderIfEmptyList() = this.showHeaderIfEmptyList
 }
