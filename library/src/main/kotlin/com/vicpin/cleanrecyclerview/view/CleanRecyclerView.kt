@@ -20,7 +20,10 @@ import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.PagedDataCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
-import com.vicpin.cleanrecyclerview.repository.datasource.*
+import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.EmptyCache
 import com.vicpin.cleanrecyclerview.view.interfaces.Mapper
 import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenterImpl
 import com.vicpin.cleanrecyclerview.view.util.DividerDecoration
@@ -158,7 +161,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     /**
      * Load methods with no pagination
      */
-    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudDataSource<DataEntity> = EmptyCloud(), cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudDataSource<DataEntity>? = null, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
         inited = false
         val repository = ListRepository(cache, cloud)
         val useCase = PagedDataCase(repository, mapper)
@@ -169,7 +172,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         init(paged = false)
     }
 
-    fun loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudDataSource<DataEntity> = EmptyCloud(), cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudDataSource<DataEntity>? = null, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
         load(SingleLinePresenterAdapter(layoutResId), cloud, cache, mapper)
     }
 
@@ -178,7 +181,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     fun load(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudDataSource<DataEntity>>? = null, cache: Class<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
-        load(adapter, cloud?.newInstance() ?: EmptyCloud(), cache?.newInstance() ?: EmptyCache(), mapper)
+        load(adapter, cloud?.newInstance(), cache?.newInstance() ?: EmptyCache(), mapper)
     }
 
     private fun init(paged: Boolean = true) {
@@ -240,6 +243,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     override fun showProgress() {
         hideEmptyLayout()
         hideErrorLayout()
+        adapter?.clearData()
+        setRefreshEnabled(false)
         progress?.visibility = View.VISIBLE
     }
 
@@ -263,8 +268,10 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun hideLoadMore() {
-        adapter?.loadMoreListener = null
-        Handler().postDelayed({ adapter?.disableLoadMore() }, 100)
+        if(adapter?.loadMoreListener != null) {
+            adapter?.loadMoreListener = null
+            Handler().postDelayed({ adapter?.disableLoadMore() }, 100)
+        }
     }
 
     override fun showRefreshing() {
@@ -277,7 +284,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         refresh?.isRefreshing = false
     }
 
-    fun setRefreshEnabled(enabled: Boolean) {
+    override fun setRefreshEnabled(enabled: Boolean) {
         refreshEnabled = enabled
         refresh?.isEnabled = enabled
     }
@@ -322,10 +329,14 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     fun loadEmptyLayout() {
         if (emptyLayout > 0) {
+            if(empty?.childCount ?: 0 > 0) {
+                empty?.removeAllViews()
+            }
             if (empty?.childCount == 0) {
                 val view = View.inflate(context, emptyLayout, null)
                 empty?.addView(view)
             }
+
         }
     }
 
@@ -339,11 +350,13 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun showEmptyLayout() {
+        emptyError?.visibility = View.GONE
         empty?.visibility = View.VISIBLE
         eventListener?.invoke(Event.EMPTY_LAYOUT_SHOWED)
     }
 
     override fun showErrorLayout() {
+        empty?.visibility = View.GONE
         emptyError?.visibility = View.VISIBLE
         eventListener?.invoke(Event.ERROR_LAYOUT_SHOWED)
     }
@@ -368,15 +381,32 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         }
     }
 
-    fun addScrollListener(onScroll: () -> Unit, onStop: () -> Unit) {
+    private var overallYScroll = 0
+    var isScrollingDown = false
+    var isScrollingUp = false
+
+    fun addScrollListener(onScroll: ((Int) -> Unit)? = null, onStop: ((Int) -> Unit)? = null) {
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING || newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    onScroll()
+                    //Do nothing
                 } else {
-                    onStop()
+                    onStop?.invoke(overallYScroll)
                 }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                overallYScroll += dy
+                if(dy > 0) {
+                    isScrollingDown = true
+                    isScrollingUp = false
+                } else {
+                    isScrollingDown = false
+                    isScrollingUp = true
+                }
+                onScroll?.invoke(overallYScroll)
             }
         })
     }
@@ -384,4 +414,10 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     override fun hasHeaders() = if(adapter != null) adapter!!.getHeadersCount() > 0 else false
 
     override fun showHeaderIfEmptyList() = this.showHeaderIfEmptyList
+
+    fun isEmpty(): Boolean {
+        return adapter?.getData()?.isEmpty() ?: true
+    }
+
+    override fun isShowingEmptyLayout() = empty?.visibility == View.VISIBLE
 }

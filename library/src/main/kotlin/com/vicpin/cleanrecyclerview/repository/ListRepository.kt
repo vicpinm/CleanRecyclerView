@@ -11,10 +11,14 @@ import io.reactivex.schedulers.Schedulers
 /**
  * Created by Victor on 20/01/2017.
  */
-class ListRepository<T> constructor(internal var cache: CacheDataSource<T>, internal var cloud: CloudDataSource<T>) : IRepository<T>  {
+class ListRepository<T> constructor(internal var cache: CacheDataSource<T>, internal var cloud: CloudDataSource<T>? = null) : IRepository<T>  {
 
     override fun getData(currentPage: Int): Flowable<Pair<CRDataSource, List<T>>> {
-        return Flowable.concat(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()),getDataPageFromCloud(currentPage).toFlowable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
+        return if(cloud != null) {
+            Flowable.concat(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()), getDataPageFromCloud(currentPage).toFlowable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
+        } else {
+            getDataFromDisk()
+        }
     }
 
     override fun getDataFromDisk(): Flowable<Pair<CRDataSource, List<T>>> {
@@ -26,7 +30,7 @@ class ListRepository<T> constructor(internal var cache: CacheDataSource<T>, inte
 
 
     override fun getDataPageFromCloud(currentPage: Int): Single<Pair<CRDataSource, List<T>>> {
-        return cloud.getData()
+        return cloud!!.getData()
                 .doOnSuccess { data -> cache.clearData() }
                 .doOnSuccess { data -> cache.saveData(data) }
                 .map { data -> Pair<CRDataSource, List<T>>(CRDataSource.CLOUD, data) }

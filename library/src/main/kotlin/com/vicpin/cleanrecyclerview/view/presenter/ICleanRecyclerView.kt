@@ -35,4 +35,8 @@ interface ICleanRecyclerView<T> {
     fun hasHeaders() : Boolean
 
     fun showHeaderIfEmptyList(): Boolean
+
+    fun setRefreshEnabled(b: Boolean)
+
+    fun isShowingEmptyLayout(): Boolean
 }

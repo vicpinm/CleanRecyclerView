@@ -11,13 +11,16 @@ import io.reactivex.schedulers.Schedulers
 /**
  * Created by Victor on 20/01/2017.
  */
-class PagedListRepository<T> constructor(internal var cache: CacheDataSource<T>, internal var cloud: CloudPagedDataSource<T>) : IRepository<T>  {
+class PagedListRepository<T> constructor(internal var cache: CacheDataSource<T>, internal var cloud: CloudPagedDataSource<T>? = null) : IRepository<T>  {
 
     override fun getData(currentPage: Int): Flowable<Pair<CRDataSource, List<T>>> {
-        if (currentPage == 0) {
-            return Flowable.concat(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()),getDataPageFromCloud(currentPage).toFlowable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
+        return if(cloud == null) {
+            getDataFromDisk()
+        }
+        else if (currentPage == 0) {
+            Flowable.concat(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()),getDataPageFromCloud(currentPage).toFlowable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
         } else {
-            return getDataPageFromCloud(currentPage).toFlowable()
+             getDataPageFromCloud(currentPage).toFlowable()
         }
     }
 
@@ -28,7 +31,7 @@ class PagedListRepository<T> constructor(internal var cache: CacheDataSource<T>,
     }
 
     override fun getDataPageFromCloud(currentPage: Int): Single<Pair<CRDataSource, List<T>>> {
-        return cloud.getData(currentPage)
+        return cloud!!.getData(currentPage)
                 .doOnSuccess { result ->
                     if (currentPage == 0) {
                         cache.clearData()

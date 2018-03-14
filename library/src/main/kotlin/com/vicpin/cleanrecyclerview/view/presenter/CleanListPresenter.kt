@@ -23,7 +23,10 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     fun fetchData(fromRefresh : Boolean = false, onlyDisk : Boolean = false) {
         if(!fromRefresh) {
             showProgress()
+        } else if(itemsLoadedSize == 0 && mView?.isShowingEmptyLayout() == false) {
+            showProgress()
         }
+
         dataCase.onlyDisk = onlyDisk
         executeUseCase()
     }
@@ -36,16 +39,19 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     }
 
     private fun onDataFetched(source: CRDataSource, data: List<ViewEntity>) {
-        itemsLoadedSize += data.size
+
+        if(currentPage == 0 && source == CRDataSource.DISK && data.isEmpty()) {
+            itemsLoadedSize = 0
+            mView?.showProgress()
+        } else {
+            itemsLoadedSize += data.size
+        }
 
         if (data.isNotEmpty()) {
             loadDataIntoView(data)
         }
         else if(currentPage == 0){
             clearDataFromView()
-            if(source == CRDataSource.CLOUD){
-                showEmptyLayout()
-            }
         }
 
         updateRefreshingWidget(source)
@@ -55,6 +61,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     private fun dataLoadCompleted() {
         mView?.hideRefreshing()
         mView?.hideProgress()
+        mView?.setRefreshEnabled(true)
 
         if(itemsLoadedSize == 0) {
             showEmptyLayout()
@@ -93,8 +100,10 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     }
 
     private fun clearDataFromView(){
-        mView?.setData(ArrayList<ViewEntity>())
-        itemsLoadedSize = 0
+        if(itemsLoadedSize > 0) {
+            mView?.setData(ArrayList<ViewEntity>())
+            itemsLoadedSize = 0
+        }
     }
 
     private fun updateLoadMoreIndicator(source: CRDataSource, itemsLoaded: Int) {
@@ -136,6 +145,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
         mView?.hideRefreshing()
         mView?.hideEmptyLayout()
         mView?.hideErrorLayout()
+        mView?.setRefreshEnabled(true)
 
         if(isShowingLoadMore){
             mView?.showLoadMoreError()
