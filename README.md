@@ -17,7 +17,7 @@ allprojects {
   And add the dependency
   ```groovy
 dependencies {
-	   compile 'com.github.vicpinm:CleanRecyclerView:4.0'
+	   compile 'com.github.vicpinm:CleanRecyclerView:4.0.1'
 }
   ```
   
