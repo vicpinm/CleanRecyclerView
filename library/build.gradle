@@ -29,7 +29,7 @@ android {
 ext {
     support = "26.1.0"
     materialish = "1.7"
-    presenter_adapter = "1.1.2"
+    presenter_adapter = "2.0.2"
     autosubscription = '1.0.2'
 }
 
@@ -54,7 +54,7 @@ dependencies {
     // Materialish
     compile "com.pnikosis:materialish-progress:$materialish"
 
-    compile "com.github.vicpinm:KPresenterAdapter:$presenter_adapter"
+    compile "com.github.vicpinm:kpresenteradapter:$presenter_adapter"
     compile "com.github.vicpinm:autosubscription:$autosubscription"
 
 
