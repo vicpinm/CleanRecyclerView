@@ -419,5 +419,5 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         return adapter?.getData()?.isEmpty() ?: true
     }
 
-    override fun isShowingEmptyLayout() = empty?.visibility == View.VISIBLE
+    override fun isShowingPlaceholder() = empty?.visibility == View.VISIBLE || emptyError?.visibility == View.VISIBLE
 }

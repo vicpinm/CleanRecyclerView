@@ -38,5 +38,5 @@ interface ICleanRecyclerView<T> {
 
     fun setRefreshEnabled(b: Boolean)
 
-    fun isShowingEmptyLayout(): Boolean
+    fun isShowingPlaceholder(): Boolean
 }

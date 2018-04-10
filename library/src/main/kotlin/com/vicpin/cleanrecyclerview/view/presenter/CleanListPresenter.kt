@@ -23,7 +23,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     fun fetchData(fromRefresh : Boolean = false, onlyDisk : Boolean = false) {
         if(!fromRefresh) {
             showProgress()
-        } else if(itemsLoadedSize == 0 && mView?.isShowingEmptyLayout() == false) {
+        } else if(itemsLoadedSize == 0 && mView?.isShowingPlaceholder() == false) {
             showProgress()
         }
 
@@ -42,7 +42,9 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
 
         if(currentPage == 0 && source == CRDataSource.DISK && data.isEmpty()) {
             itemsLoadedSize = 0
-            mView?.showProgress()
+            if(mView?.isShowingPlaceholder() == false) {
+                mView?.showProgress()
+            }
         } else {
             itemsLoadedSize += data.size
         }
@@ -166,12 +168,12 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     }
 
     fun refreshData() {
-        init()
+        currentPage = 0
         fetchData(fromRefresh = true)
     }
 
     fun refreshCache() {
-        init()
+        currentPage = 0
         fetchData(fromRefresh = true, onlyDisk = true)
     }
 

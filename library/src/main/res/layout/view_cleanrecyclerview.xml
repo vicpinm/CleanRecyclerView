@@ -11,11 +11,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerListView"
-            android:scrollbars="vertical"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerListView"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <FrameLayout
+                android:id="@+id/empty"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <FrameLayout
+                android:id="@+id/emptyError"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </RelativeLayout>
+
 
 
     </android.support.v4.widget.SwipeRefreshLayout>
@@ -33,17 +52,6 @@
         app:matProg_barWidth="3dp"
         app:matProg_progressIndeterminate="true"/>
 
-    <FrameLayout
-        android:id="@+id/empty"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <FrameLayout
-        android:id="@+id/emptyError"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
 </RelativeLayout>
 
