@@ -1,6 +1,7 @@
 package com.vicpin.cleanrecyclerview.sample.data
 
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.SimpleCloudDataSource
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import io.reactivex.Single
 import java.util.concurrent.TimeUnit
@@ -8,7 +9,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by victor on 21/1/17.
  */
-open class ItemService : CloudDataSource<Item> {
+open class ItemService : SimpleCloudDataSource<Item> {
 
     val description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
 

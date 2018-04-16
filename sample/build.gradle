@@ -17,6 +17,7 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -44,7 +45,7 @@ ext{
     support = "27.1.0"
     butterknife = "8.4.0"
     picasso = "2.5.2"
-    constraint = "1.0.0-beta4"
+    constraint = "1.0.0"
     espresso = "2.2.2"
     mockwebserver = '3.4.1'
     mockito = "2.8.9"
@@ -79,7 +80,6 @@ dependencies {
     kapt "com.jakewharton:butterknife-compiler:$butterknife"
     // Picasso
     compile "com.squareup.picasso:picasso:$picasso"
-    compile 'com.marshalchen.ultimaterecyclerview:library:0.7.0'
     androidTestCompile "com.android.support:support-annotations:$support"
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
@@ -100,6 +100,8 @@ dependencies {
     }
     androidTestCompile "org.mockito:mockito-android:$mockito"
     androidTestCompile "com.nhaarman:mockito-kotlin:$mockito_kotlin"
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.android.support:multidex:1.0.1'
 
     androidTestCompile (project(':injector')) { transitive = false }
 

@@ -6,9 +6,9 @@ import java.util.*
 /**
  * Created by Oesia on 10/10/2017.
  */
-class EmptyCloud<T> : CloudDataSource<T> {
+class EmptyCloud<T> : CloudDataSource<T, T> {
 
-    override fun getData(): Single<List<T>> {
+    override fun getData(data: T?): Single<List<T>> {
         return Single.just(Collections.emptyList())
     }
 }

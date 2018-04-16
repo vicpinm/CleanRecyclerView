@@ -1,5 +1,6 @@
 package com.vicpin.cleanrecyclerview.sample
 
+import android.support.multidex.MultiDexApplication
 import com.vicpin.cleanrecyclerview.sample.di.AppComponent
 import com.vicpin.cleanrecyclerview.sample.di.AppModule
 import com.vicpin.cleanrecyclerview.sample.di.DaggerAppComponent
@@ -8,7 +9,7 @@ import com.vicpin.cleanrecyclerview.sample.di.DaggerAppComponent
  * Created by Oesia on 29/05/2017.
  */
 
-class Application : android.app.Application() {
+class Application : MultiDexApplication() {
 
     lateinit var applicationComponent: AppComponent
 

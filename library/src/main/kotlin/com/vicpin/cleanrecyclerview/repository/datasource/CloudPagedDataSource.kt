@@ -5,7 +5,7 @@ import io.reactivex.Single
 /**
  * Created by Victor on 20/01/2017.
  */
-interface CloudPagedDataSource<T> {
+interface CloudPagedDataSource<DataEntity,in CustomData> {
 
-    fun getData(page: Int): Single<List<T>>
+    fun getData(page: Int, data: CustomData? = null): Single<List<DataEntity>>
 }

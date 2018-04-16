@@ -11,9 +11,9 @@ import io.reactivex.schedulers.Schedulers
 /**
  * Created by Victor on 20/01/2017.
  */
-class PagedListRepository<T> constructor(internal var cache: CacheDataSource<T>, internal var cloud: CloudPagedDataSource<T>? = null) : IRepository<T>  {
+class PagedListRepository<DataEntity, CustomData> constructor(internal var cache: CacheDataSource<DataEntity>, internal var cloud: CloudPagedDataSource<DataEntity, CustomData>? = null, var customData: CustomData? = null) : IRepository<DataEntity>  {
 
-    override fun getData(currentPage: Int): Flowable<Pair<CRDataSource, List<T>>> {
+    override fun getData(currentPage: Int): Flowable<Pair<CRDataSource, List<DataEntity>>> {
         return if(cloud == null) {
             getDataFromDisk()
         }
@@ -24,20 +24,20 @@ class PagedListRepository<T> constructor(internal var cache: CacheDataSource<T>,
         }
     }
 
-    override fun getDataFromDisk(): Flowable<Pair<CRDataSource, List<T>>> {
+    override fun getDataFromDisk(): Flowable<Pair<CRDataSource, List<DataEntity>>> {
         return cache.getData().map { list ->
-            Pair<CRDataSource, List<T>>(CRDataSource.DISK, list)
+            Pair(CRDataSource.DISK, list)
         }
     }
 
-    override fun getDataPageFromCloud(currentPage: Int): Single<Pair<CRDataSource, List<T>>> {
-        return cloud!!.getData(currentPage)
+    override fun getDataPageFromCloud(currentPage: Int): Single<Pair<CRDataSource, List<DataEntity>>> {
+        return cloud!!.getData(currentPage, customData)
                 .doOnSuccess { result ->
                     if (currentPage == 0) {
                         cache.clearData()
                     }
                 }.doOnSuccess { data -> cache.saveData(data) }
-                .map { list -> Pair<CRDataSource, List<T>>(CRDataSource.CLOUD, list) }
+                .map { list -> Pair(CRDataSource.CLOUD, list) }
     }
 
 }
