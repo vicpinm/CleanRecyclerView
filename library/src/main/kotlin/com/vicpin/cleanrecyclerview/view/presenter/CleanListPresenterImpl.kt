@@ -1,6 +1,6 @@
 package com.vicpin.cleanrecyclerview.view.presenter
 
-import com.vicpin.cleanrecyclerview.domain.PagedDataCase
+import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpinm.autosubscription.Unsubscriber
 import com.vicpinm.autosubscription.anotations.AutoSubscription
 
@@ -8,7 +8,7 @@ import com.vicpinm.autosubscription.anotations.AutoSubscription
  * Created by Victor on 20/01/2017.
  */
 class CleanListPresenterImpl<ViewEntity, DataEntity>
-constructor(mUseCase : PagedDataCase<ViewEntity, DataEntity>) : CleanListPresenter<ViewEntity, DataEntity, CleanListPresenterImpl.View<ViewEntity>>() {
+constructor(mUseCase : GetDataCase<ViewEntity, DataEntity>) : CleanListPresenter<ViewEntity, DataEntity, CleanListPresenterImpl.View<ViewEntity>>() {
 
     @AutoSubscription override val dataCase = mUseCase
     override var pageLimit = 0

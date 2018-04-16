@@ -1,6 +1,6 @@
 package com.vicpin.cleanrecyclerview.view.presenter
 
-import com.vicpin.cleanrecyclerview.domain.PagedDataCase
+import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import java.util.*
 
@@ -177,7 +177,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
         fetchData(fromRefresh = true, onlyDisk = true)
     }
 
-    abstract val dataCase: PagedDataCase<ViewEntity, DataEntity>
+    abstract val dataCase: GetDataCase<ViewEntity, DataEntity>
 
     abstract val pageLimit: Int
 

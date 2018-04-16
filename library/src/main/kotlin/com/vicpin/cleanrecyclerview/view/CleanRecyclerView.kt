@@ -17,7 +17,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import com.pnikosis.materialishprogress.ProgressWheel
 import com.vicpin.cleanrecyclerview.R
-import com.vicpin.cleanrecyclerview.domain.PagedDataCase
+import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
@@ -142,7 +142,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: CloudPagedDataSource<DataEntity>, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
         inited = false
         val repository = PagedListRepository(cache, cloud)
-        val useCase = PagedDataCase(repository, mapper)
+        val useCase = GetDataCase(repository, mapper)
         presenter = CleanListPresenterImpl(useCase)
         presenter?.mView = this
         this.adapter = adapter
@@ -164,7 +164,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     fun load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudDataSource<DataEntity>? = null, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
         inited = false
         val repository = ListRepository(cache, cloud)
-        val useCase = PagedDataCase(repository, mapper)
+        val useCase = GetDataCase(repository, mapper)
         presenter = CleanListPresenterImpl(useCase)
         presenter?.mView = this
         this.adapter = adapter
