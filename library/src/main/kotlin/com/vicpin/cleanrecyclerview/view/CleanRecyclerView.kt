@@ -11,10 +11,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
-import android.widget.AbsListView
-import android.widget.FrameLayout
-import android.widget.RelativeLayout
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import com.pnikosis.materialishprogress.ProgressWheel
 import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
@@ -80,6 +78,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var dividerDrawable: Int = 0
     private var refreshEnabled = false
     private var showHeaderIfEmptyList = false
+    private var wrapInNestedScroll = false
 
     constructor(context: Context?) : super(context)
 
@@ -104,6 +103,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             dividerDrawable = a?.getResourceId(R.styleable.CleanRecyclerView_dividerDrawable, 0) ?: 0
             refreshEnabled = a?.getBoolean(R.styleable.CleanRecyclerView_refreshEnabled, true) ?: true
             showHeaderIfEmptyList = a?.getBoolean(R.styleable.CleanRecyclerView_showHeaderIfEmptyList, false) ?: false
+            wrapInNestedScroll = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInNestedScroll, false) ?: false
         } finally {
             a?.recycle()
         }
@@ -128,7 +128,15 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     private fun inflateView() {
-        inflate(context, if (wrapInCardView) R.layout.view_cleanrecyclerview_cardview else R.layout.view_cleanrecyclerview, this)
+        val layout = if (wrapInCardView) {
+            R.layout.view_cleanrecyclerview_cardview
+        } else if (wrapInNestedScroll) {
+            R.layout.view_cleanrecyclerview_nestedscroll
+        } else {
+            R.layout.view_cleanrecyclerview
+        }
+
+        inflate(context, layout, this)
         progress = findViewById(R.id.progress)
         refresh = findViewById(R.id.refresh)
         empty = findViewById(R.id.empty)
@@ -139,7 +147,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     /**
      * Load paged methods
      */
-    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: CloudPagedDataSource<DataEntity>, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: CloudPagedDataSource<DataEntity>, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper: Mapper<ViewEntity, DataEntity>? = null) {
         inited = false
         val repository = PagedListRepository(cache, cloud)
         val useCase = GetDataCase(repository, mapper)
@@ -150,18 +158,18 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         init()
     }
 
-    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out CloudPagedDataSource<DataEntity>>, cache: KClass<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out CloudPagedDataSource<DataEntity>>, cache: KClass<out CacheDataSource<DataEntity>>? = null, mapper: Mapper<ViewEntity, DataEntity>? = null) {
         loadPaged(adapter, cloud.java, cache?.java, mapper)
     }
 
-    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudPagedDataSource<DataEntity>>, cache: Class<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudPagedDataSource<DataEntity>>, cache: Class<out CacheDataSource<DataEntity>>? = null, mapper: Mapper<ViewEntity, DataEntity>? = null) {
         loadPaged(adapter, cloud.newInstance(), cache?.newInstance() ?: EmptyCache(), mapper)
     }
 
     /**
      * Load methods with no pagination
      */
-    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudDataSource<DataEntity>? = null, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudDataSource<DataEntity>? = null, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper: Mapper<ViewEntity, DataEntity>? = null) {
         inited = false
         val repository = ListRepository(cache, cloud)
         val useCase = GetDataCase(repository, mapper)
@@ -172,15 +180,15 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         init(paged = false)
     }
 
-    fun loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudDataSource<DataEntity>? = null, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudDataSource<DataEntity>? = null, cache: CacheDataSource<DataEntity> = EmptyCache(), mapper: Mapper<ViewEntity, DataEntity>? = null) {
         load(SingleLinePresenterAdapter(layoutResId), cloud, cache, mapper)
     }
 
-    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out CloudDataSource<DataEntity>>? = null, cache: KClass<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out CloudDataSource<DataEntity>>? = null, cache: KClass<out CacheDataSource<DataEntity>>? = null, mapper: Mapper<ViewEntity, DataEntity>? = null) {
         load(adapter, cloud?.java, cache?.java, mapper)
     }
 
-    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudDataSource<DataEntity>>? = null, cache: Class<out CacheDataSource<DataEntity>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null) {
+    fun load(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudDataSource<DataEntity>>? = null, cache: Class<out CacheDataSource<DataEntity>>? = null, mapper: Mapper<ViewEntity, DataEntity>? = null) {
         load(adapter, cloud?.newInstance(), cache?.newInstance() ?: EmptyCache(), mapper)
     }
 
@@ -268,7 +276,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun hideLoadMore() {
-        if(adapter?.loadMoreListener != null) {
+        if (adapter?.loadMoreListener != null) {
             adapter?.loadMoreListener = null
             Handler().postDelayed({ adapter?.disableLoadMore() }, 100)
         }
@@ -329,7 +337,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     fun loadEmptyLayout() {
         if (emptyLayout > 0) {
-            if(empty?.childCount ?: 0 > 0) {
+            if (empty?.childCount ?: 0 > 0) {
                 empty?.removeAllViews()
             }
             if (empty?.childCount == 0) {
@@ -399,7 +407,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 overallYScroll += dy
-                if(dy > 0) {
+                if (dy > 0) {
                     isScrollingDown = true
                     isScrollingUp = false
                 } else {
@@ -411,7 +419,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         })
     }
 
-    override fun hasHeaders() = if(adapter != null) adapter!!.getHeadersCount() > 0 else false
+    override fun hasHeaders() = if (adapter != null) adapter!!.getHeadersCount() > 0 else false
 
     override fun showHeaderIfEmptyList() = this.showHeaderIfEmptyList
 
@@ -420,4 +428,36 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun isShowingPlaceholder() = empty?.visibility == View.VISIBLE || emptyError?.visibility == View.VISIBLE
+
+    /**
+     * @param v: View to add as header inside nestedscroll
+     * @param width: width of your view (MATCH_PARENT, WRAP_CONTENT)
+     * @param height: height of your view (MATCH_PARENT, WRAP_CONTENT)
+     */
+    fun addNestedHeaderView(v: View, width: Int = ViewGroup.LayoutParams.MATCH_PARENT, height: Int = ViewGroup.LayoutParams.WRAP_CONTENT) {
+        if (!wrapInNestedScroll) {
+            IllegalStateException("Function only available when using attr wrapInNestedScroll with true")
+        }
+        findViewById<LinearLayout>(R.id.nestedHeader)?.let {
+            it.visibility = View.VISIBLE
+            v.layoutParams = ViewGroup.LayoutParams(width,height)
+            it.addView(v)
+        }
+    }
+
+    /**
+     * @param v: View to add as footer inside nestedscroll
+     * @param width: width of your view (MATCH_PARENT, WRAP_CONTENT)
+     * @param height: height of your view (MATCH_PARENT, WRAP_CONTENT)
+     */
+    fun addNestedFooterView(v: View, width: Int = ViewGroup.LayoutParams.MATCH_PARENT, height: Int = ViewGroup.LayoutParams.WRAP_CONTENT) {
+        if (!wrapInNestedScroll) {
+            IllegalStateException("Function only available when using attr wrapInNestedScroll with true")
+        }
+        findViewById<LinearLayout>(R.id.nestedFooter)?.let {
+            it.visibility = View.VISIBLE
+            v.layoutParams = ViewGroup.LayoutParams(width,height)
+            it.addView(v)
+        }
+    }
 }

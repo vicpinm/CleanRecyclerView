@@ -79,7 +79,6 @@ dependencies {
     kapt "com.jakewharton:butterknife-compiler:$butterknife"
     // Picasso
     compile "com.squareup.picasso:picasso:$picasso"
-    compile 'com.marshalchen.ultimaterecyclerview:library:0.7.0'
     androidTestCompile "com.android.support:support-annotations:$support"
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
