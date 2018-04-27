@@ -11,10 +11,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
-import android.widget.AbsListView
-import android.widget.FrameLayout
-import android.widget.RelativeLayout
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import com.pnikosis.materialishprogress.ProgressWheel
 import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
@@ -79,6 +77,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var dividerDrawable: Int = 0
     private var refreshEnabled = false
     private var showHeaderIfEmptyList = false
+    private var wrapInNestedScroll = false
 
     constructor(context: Context?) : super(context)
 
@@ -103,6 +102,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             dividerDrawable = a?.getResourceId(R.styleable.CleanRecyclerView_dividerDrawable, 0) ?: 0
             refreshEnabled = a?.getBoolean(R.styleable.CleanRecyclerView_refreshEnabled, true) ?: true
             showHeaderIfEmptyList = a?.getBoolean(R.styleable.CleanRecyclerView_showHeaderIfEmptyList, false) ?: false
+            wrapInNestedScroll = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInNestedScroll, false) ?: false
         } finally {
             a?.recycle()
         }
@@ -127,12 +127,24 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     private fun inflateView() {
-        inflate(context, if (wrapInCardView) R.layout.view_cleanrecyclerview_cardview else R.layout.view_cleanrecyclerview, this)
+        val layout = if (wrapInCardView) {
+            R.layout.view_cleanrecyclerview_cardview
+        } else if (wrapInNestedScroll) {
+            R.layout.view_cleanrecyclerview_nestedscroll
+        } else {
+            R.layout.view_cleanrecyclerview
+        }
+
+        inflate(context, layout, this)
         progress = findViewById(R.id.progress)
         refresh = findViewById(R.id.refresh)
         empty = findViewById(R.id.empty)
         emptyError = findViewById(R.id.emptyError)
         recyclerView = findViewById(R.id.recyclerListView)
+
+        if(wrapInNestedScroll) {
+            recyclerView?.isNestedScrollingEnabled = false
+        }
     }
 
     /**
@@ -419,4 +431,38 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun isShowingPlaceholder() = empty?.visibility == View.VISIBLE || emptyError?.visibility == View.VISIBLE
+
+
+    /**
+     * @param v: View to add as header inside nestedscroll
+     * @param width: width of your view (MATCH_PARENT, WRAP_CONTENT)
+     * @param height: height of your view (MATCH_PARENT, WRAP_CONTENT)
+     */
+    fun addNestedHeaderView(v: View, width: Int = ViewGroup.LayoutParams.MATCH_PARENT, height: Int = ViewGroup.LayoutParams.WRAP_CONTENT) {
+        if (!wrapInNestedScroll) {
+            IllegalStateException("Function only available when using attr wrapInNestedScroll with true")
+        }
+        findViewById<LinearLayout>(R.id.nestedHeader)?.let {
+            it.visibility = View.VISIBLE
+            v.layoutParams = ViewGroup.LayoutParams(width,height)
+            it.addView(v)
+        }
+    }
+
+    /**
+     * @param v: View to add as footer inside nestedscroll
+     * @param width: width of your view (MATCH_PARENT, WRAP_CONTENT)
+     * @param height: height of your view (MATCH_PARENT, WRAP_CONTENT)
+     */
+    fun addNestedFooterView(v: View, width: Int = ViewGroup.LayoutParams.MATCH_PARENT, height: Int = ViewGroup.LayoutParams.WRAP_CONTENT) {
+        if (!wrapInNestedScroll) {
+            IllegalStateException("Function only available when using attr wrapInNestedScroll with true")
+        }
+        findViewById<LinearLayout>(R.id.nestedFooter)?.let {
+            it.visibility = View.VISIBLE
+            v.layoutParams = ViewGroup.LayoutParams(width,height)
+            it.addView(v)
+        }
+    }
+
 }
