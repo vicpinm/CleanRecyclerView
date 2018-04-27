@@ -7,22 +7,14 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.vicpin.cleanrecyclerview.sample.R
-import com.vicpin.cleanrecyclerview.sample.data.ItemCache
-import com.vicpin.cleanrecyclerview.sample.data.ItemPagedService
-import com.vicpin.cleanrecyclerview.sample.data.ItemService
 import com.vicpin.cleanrecyclerview.sample.extensions.injector
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import com.vicpin.cleanrecyclerview.sample.view.adapter.AdapterItemView
 import com.vicpin.cleanrecyclerview.view.SimpleCleanRecyclerView
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-
-    @Inject lateinit var pagedService : ItemPagedService
-    @Inject lateinit var noPagedService : ItemService
-    @Inject lateinit var itemCache : ItemCache
 
     var paginated = true
     var menuItem : MenuItem? = null
@@ -39,38 +31,37 @@ class MainActivity : AppCompatActivity() {
         paginated = true
         menuItem?.title = getString(R.string.no_paginated)
 
-        val cleanRecyclerView = list as SimpleCleanRecyclerView<Item>
         val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
-        cleanRecyclerView.loadPaged(adapter, pagedService, itemCache)
+        list.load(adapter)
 
-        cleanRecyclerView.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }
+        list.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }
     }
 
-    fun initNoPagedList() {
+    /*fun initNoPagedList() {
 
         paginated = false
         menuItem?.title = getString(R.string.paginated)
 
-        val cleanRecyclerView = list as SimpleCleanRecyclerView<Item>
+        val cleanRecyclerView = list as CleanRecyclerView<Item, Item>
         val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
         cleanRecyclerView.load(adapter, noPagedService, itemCache)
 
         cleanRecyclerView.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }
-    }
+    }*/
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu, menu)
-        menuItem = menu?.findItem(R.id.paginated)
+       // menuInflater.inflate(R.menu.menu, menu)
+      //  menuItem = menu?.findItem(R.id.paginated)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val cleanRecyclerView = list as SimpleCleanRecyclerView<Item>
 
-        when(item?.itemId){
-            R.id.paginated -> if(paginated) initNoPagedList() else initPagedList()
+        when(item?.itemId) {
+            //R.id.paginated -> if(paginated) initNoPagedList() else initPagedList()
             R.id.vertical -> cleanRecyclerView.layoutManager = LinearLayoutManager(this)
             R.id.horizontal -> cleanRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             R.id.grid -> cleanRecyclerView.layoutManager = GridLayoutManager(this, 2)

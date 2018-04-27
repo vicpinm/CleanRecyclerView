@@ -39,13 +39,18 @@ android {
         exclude 'META-INF/library_release.kotlin_module'
         exclude 'META-INF/services/org.codehaus.groovy.transform.ASTTransformation'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 ext{
     support = "27.1.0"
     butterknife = "8.4.0"
     picasso = "2.5.2"
-    constraint = "1.0.0"
+    constraint = "1.1.0"
     espresso = "2.2.2"
     mockwebserver = '3.4.1'
     mockito = "2.8.9"
@@ -63,53 +68,39 @@ kapt {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile "com.android.support:design:$support"
-    compile "com.android.support:appcompat-v7:$support"
-    compile "com.android.support:cardview-v7:$support"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:design:$support"
+    implementation "com.android.support:appcompat-v7:$support"
+    implementation "com.android.support:cardview-v7:$support"
     testCompile 'junit:junit:4.12'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile project(':library')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation project(':library')
     // Constraint Layout
-    compile "com.android.support.constraint:constraint-layout:$constraint"
+    implementation "com.android.support.constraint:constraint-layout:$constraint"
     // Butterknife
-    compile "com.jakewharton:butterknife:$butterknife"
+    implementation "com.jakewharton:butterknife:$butterknife"
     kapt "com.jakewharton:butterknife-compiler:$butterknife"
     // Picasso
-    compile "com.squareup.picasso:picasso:$picasso"
-    androidTestCompile "com.android.support:support-annotations:$support"
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$espresso"
+    implementation "com.squareup.picasso:picasso:$picasso"
     debugCompile "com.metova:cappuccino:$cappucino"
     releaseCompile "com.metova:cappuccino-no-op:$cappucino"
-    androidTestCompile("com.android.support.test.espresso:espresso-intents:$espresso") {
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude group: 'com.android.support', module: 'recyclerview-v7'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-        exclude group: 'com.android.support', module: 'design'
-    }
-    androidTestCompile("com.android.support.test.espresso:espresso-contrib:$espresso") {
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude group: 'com.android.support', module: 'recyclerview-v7'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-        exclude group: 'com.android.support', module: 'design'
-    }
-    androidTestCompile "org.mockito:mockito-android:$mockito"
-    androidTestCompile "com.nhaarman:mockito-kotlin:$mockito_kotlin"
-    compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support:multidex:1.0.1'
 
-    androidTestCompile (project(':injector')) { transitive = false }
+    implementation 'com.android.support:multidex:1.0.1'
+    implementation 'com.android.support:multidex:1.0.1'
 
-    compile "com.google.dagger:dagger:$dagger"
+    androidTestImplementation (project(':injector')) { transitive = false }
+
+    implementation "com.google.dagger:dagger:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
     provided 'org.glassfish:javax.annotation:10.0-b28'
-    androidTestCompile 'com.github.fabioCollini:DaggerMock:0.6.6'
 
+
+    implementation project(path: ':crv-annotation')
+    kapt project(":crv-processor")
+
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.4'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation "com.github.vicpinm:kpresenteradapter:2.0.2"
 
 }
 repositories {

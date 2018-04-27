@@ -1,6 +1,5 @@
 package com.vicpin.cleanrecyclerview.sample.data
 
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.SimpleCloudDataSource
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import io.reactivex.Single

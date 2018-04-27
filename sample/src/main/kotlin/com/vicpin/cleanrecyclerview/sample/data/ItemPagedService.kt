@@ -1,6 +1,6 @@
 package com.vicpin.cleanrecyclerview.sample.data
 
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
+import com.vicpin.cleanrecyclerview.annotation.DataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.SimpleCloudPagedDataSource
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import io.reactivex.Single
@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by victor on 21/1/17.
  */
+@DataSource
 open class ItemPagedService : SimpleCloudPagedDataSource<Item> {
 
     val PAGE_LIMIT = 5
