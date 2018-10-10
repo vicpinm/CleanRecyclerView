@@ -7,9 +7,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.vicpin.cleanrecyclerview.sample.R
+import com.vicpin.cleanrecyclerview.sample.data.ItemCache
 import com.vicpin.cleanrecyclerview.sample.extensions.injector
 import com.vicpin.cleanrecyclerview.sample.model.Item
+import com.vicpin.cleanrecyclerview.sample.model.Mapper
 import com.vicpin.cleanrecyclerview.sample.view.adapter.AdapterItemView
+import com.vicpin.cleanrecyclerview.view.CleanRecyclerView
 import com.vicpin.cleanrecyclerview.view.SimpleCleanRecyclerView
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -31,11 +34,15 @@ class MainActivity : AppCompatActivity() {
         paginated = true
         menuItem?.title = getString(R.string.no_paginated)
 
-        val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
+        (list as? CleanRecyclerView<Item, Item>)?.let {
+            val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
-        list.load(adapter)
+            it.load(adapter = adapter, cloud = null, cache = ItemCache::class, mapper = Mapper::class.java.newInstance(), customData = null)
 
-        list.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }
+
+            it.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }
+        }
+
     }
 
     /*fun initNoPagedList() {

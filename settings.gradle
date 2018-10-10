@@ -1,1 +1,1 @@
-include ':sample', ':library', ':injector', ':crv-annotation', ':crv-processor'
+include ':sample', ':library', ':crv-annotation', ':crv-processor'

@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.vicpinm'
+apply from: 'maven-push.gradle'
+
 android {
     compileSdkVersion 26
     buildToolsVersion '27.0.3'
@@ -24,6 +25,8 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
+
 }
 
 ext {

@@ -41,9 +41,14 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     private fun onDataFetched(source: CRDataSource, data: List<ViewEntity>) {
 
         if(currentPage == 0 && source == CRDataSource.DISK && data.isEmpty()) {
+            val hadDataBeforeUpdating = itemsLoadedSize > 0
             itemsLoadedSize = 0
             if(mView?.isShowingPlaceholder() == false) {
-                mView?.showProgress()
+                if(hadDataBeforeUpdating) {
+                    mView?.showEmptyLayout()
+                } else {
+                    mView?.showProgress()
+                }
             }
         } else {
             itemsLoadedSize += data.size
@@ -102,10 +107,8 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     }
 
     private fun clearDataFromView(){
-        if(itemsLoadedSize > 0) {
-            mView?.setData(ArrayList<ViewEntity>())
-            itemsLoadedSize = 0
-        }
+        mView?.setData(ArrayList<ViewEntity>())
+        itemsLoadedSize = 0
     }
 
     private fun updateLoadMoreIndicator(source: CRDataSource, itemsLoaded: Int) {
