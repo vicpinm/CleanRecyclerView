@@ -8,7 +8,7 @@ import java.util.*
 /**
  * Created by Victor on 20/01/2017.
  */
-abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerView<ViewEntity>> {
+abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerView<ViewEntity>>(val availableDatasources: List<CRDataSource>) {
 
     var mView: View? = null
     protected var itemsLoadedSize = 0
@@ -44,8 +44,9 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
             val hadDataBeforeUpdating = itemsLoadedSize > 0
             itemsLoadedSize = 0
             if(mView?.isShowingPlaceholder() == false) {
-                if(hadDataBeforeUpdating) {
+                if(hadDataBeforeUpdating || onlyCacheMode()) {
                     mView?.showEmptyLayout()
+                    mView?.hideProgress()
                 } else {
                     mView?.showProgress()
                 }
@@ -179,6 +180,8 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
         currentPage = 0
         fetchData(fromRefresh = true, onlyDisk = true)
     }
+
+    fun onlyCacheMode() = availableDatasources.size == 1 && availableDatasources.contains(CRDataSource.DISK)
 
     abstract val dataCase: GetDataCase<ViewEntity, DataEntity>
 

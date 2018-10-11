@@ -18,6 +18,7 @@ import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.PagedListRepository
+import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
@@ -154,7 +155,12 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         inited = false
         val repository = PagedListRepository(cache, cloud, customData)
         val useCase = GetDataCase(repository, mapper)
-        presenter = CleanListPresenterImpl(useCase)
+
+        val availableDatasources = mutableListOf<CRDataSource>()
+        if(cloud != null) availableDatasources.add(CRDataSource.CLOUD)
+        if(cache != null) availableDatasources.add(CRDataSource.DISK)
+
+        presenter = CleanListPresenterImpl(useCase, availableDatasources)
         presenter?.mView = this
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
@@ -176,7 +182,12 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         inited = false
         val repository = ListRepository(cache, cloud, customData)
         val useCase = GetDataCase(repository, mapper)
-        presenter = CleanListPresenterImpl(useCase)
+
+        val availableDatasources = mutableListOf<CRDataSource>()
+        if(cloud != null) availableDatasources.add(CRDataSource.CLOUD)
+        if(cache != null) availableDatasources.add(CRDataSource.DISK)
+
+        presenter = CleanListPresenterImpl(useCase, availableDatasources)
         presenter?.mView = this
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
