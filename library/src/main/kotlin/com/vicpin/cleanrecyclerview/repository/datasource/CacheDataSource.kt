@@ -5,12 +5,10 @@ import io.reactivex.Flowable
 /**
  * Created by Victor on 20/01/2017.
  */
-interface CacheDataSource<DataEntity, in CustomData> {
+interface CacheDataSource<T>: ParamCacheDataSource<T,T> {
 
-    fun getData(data: CustomData? = null) : Flowable<List<DataEntity>>
+    override fun getData(data: T?): Flowable<List<T>> = getData()
 
-    fun clearData()
-
-    fun saveData(data: List<DataEntity>)
+    fun getData(): Flowable<List<T>>
 
 }

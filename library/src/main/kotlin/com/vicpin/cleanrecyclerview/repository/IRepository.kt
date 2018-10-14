@@ -12,6 +12,6 @@ interface IRepository<DataEntity> {
 
     fun getDataFromDisk(): Flowable<Pair<CRDataSource, List<DataEntity>>>
 
-    fun getDataPageFromCloud(currentPage: Int): Single<Pair<CRDataSource, List<DataEntity>>>
+    fun getDataPageFromCloud(currentPage: Int, propagateErrors: Boolean): Flowable<Pair<CRDataSource, List<DataEntity>>>
 
 }

@@ -1,6 +1,8 @@
 package com.vicpin.cleanrecyclerview.view.presenter
 
+import android.util.Log
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
+import com.vicpin.cleanrecyclerview.domain.LoadNextPageCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import java.util.*
 
@@ -8,7 +10,7 @@ import java.util.*
 /**
  * Created by Victor on 20/01/2017.
  */
-abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerView<ViewEntity>>(val availableDatasources: List<CRDataSource>) {
+abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerView<ViewEntity>>(val observableDbMode: Boolean, val availableDatasources: List<CRDataSource>) {
 
     var mView: View? = null
     protected var itemsLoadedSize = 0
@@ -32,14 +34,19 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     }
 
     private fun executeUseCase() {
-        dataCase.currentPage = currentPage
-        dataCase.execute({ result-> onDataFetched(result.first, result.second)},
-                { dataLoadError(it) },
-                { dataLoadCompleted() })
+        if(currentPage > 0 && observableDbMode) {
+            loadNextPageCase.currentPage = currentPage
+            loadNextPageCase.execute({ result -> updateLoadMoreIndicator(result.first, result.second.size) }) //Results will be propagated throw dataCase, as we are in observableDbMode
+        } else {
+            dataCase.currentPage = currentPage
+            dataCase.execute({ result -> onDataFetched(result.first, result.second) },
+                    { dataLoadError(it) },
+                    { dataLoadCompleted() })
+        }
     }
 
     private fun onDataFetched(source: CRDataSource, data: List<ViewEntity>) {
-
+        Log.e("aa","source $source size ${data.size}")
         if(currentPage == 0 && source == CRDataSource.DISK && data.isEmpty()) {
             val hadDataBeforeUpdating = itemsLoadedSize > 0
             itemsLoadedSize = 0
@@ -100,7 +107,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
         mView?.hideErrorLayout()
         hideProgress()
 
-        if (currentPage == 0) {
+        if (currentPage == 0 || observableDbMode) {
             mView?.setData(data)
         } else {
             mView?.addData(data)
@@ -114,7 +121,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
 
     private fun updateLoadMoreIndicator(source: CRDataSource, itemsLoaded: Int) {
 
-        if (source == CRDataSource.DISK) {
+        if (source == CRDataSource.DISK && !observableDbMode) {
             hideLoadMore()
         } else {
             if (pageLimit == 0 || itemsLoaded < pageLimit) {
@@ -184,6 +191,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     fun onlyCacheMode() = availableDatasources.size == 1 && availableDatasources.contains(CRDataSource.DISK)
 
     abstract val dataCase: GetDataCase<ViewEntity, DataEntity>
+    abstract val loadNextPageCase: LoadNextPageCase<ViewEntity, DataEntity>
 
     abstract val pageLimit: Int
 

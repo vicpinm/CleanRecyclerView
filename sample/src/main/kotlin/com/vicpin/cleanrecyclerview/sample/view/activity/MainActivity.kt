@@ -8,6 +8,8 @@ import android.view.Menu
 import android.view.MenuItem
 import com.vicpin.cleanrecyclerview.sample.R
 import com.vicpin.cleanrecyclerview.sample.data.ItemCache
+import com.vicpin.cleanrecyclerview.sample.data.ItemPagedService
+import com.vicpin.cleanrecyclerview.sample.data.ItemService
 import com.vicpin.cleanrecyclerview.sample.extensions.injector
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import com.vicpin.cleanrecyclerview.sample.model.Mapper
@@ -37,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         (list as? CleanRecyclerView<Item, Item>)?.let {
             val adapter = SimplePresenterAdapter(AdapterItemView::class, R.layout.adapter_item)
 
-            it.load(adapter = adapter, cloud = null, cache = ItemCache::class, mapper = Mapper::class.java.newInstance(), customData = null)
+            it.loadPaged(adapter = adapter, cloud = ItemPagedService::class, cache = ItemCache::class, mapper = Mapper::class.java.newInstance(), customData = null)
 
 
             it.onItemClick { item, view -> DetailActivity.launchActivity(this, view.itemView.findViewById(R.id.header), item) }

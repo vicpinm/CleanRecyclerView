@@ -1,7 +1,8 @@
 package com.vicpin.cleanrecyclerview.sample.data
 
+import android.util.Log
 import com.vicpin.cleanrecyclerview.annotation.DataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.SimpleCloudPagedDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
 import com.vicpin.cleanrecyclerview.sample.model.Item
 import io.reactivex.Single
 import java.util.concurrent.TimeUnit
@@ -10,7 +11,7 @@ import java.util.concurrent.TimeUnit
  * Created by victor on 21/1/17.
  */
 @DataSource
-open class ItemPagedService : SimpleCloudPagedDataSource<Item> {
+open class ItemPagedService : CloudPagedDataSource<Item> {
 
     val PAGE_LIMIT = 5
     var description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
@@ -18,6 +19,7 @@ open class ItemPagedService : SimpleCloudPagedDataSource<Item> {
     override fun getData(page: Int): Single<List<Item>> {
         return Single.just(getFakeItems(page)).delay(2, TimeUnit.SECONDS)
     }
+
 
     fun getFakeItems(startFrom: Int): List<Item> {
 
@@ -42,6 +44,7 @@ open class ItemPagedService : SimpleCloudPagedDataSource<Item> {
             list.add(item5)
         }
 
+Log.e("aa","service solicitada pag $startFrom devolviendo ${list.size}")
         return list
     }
 

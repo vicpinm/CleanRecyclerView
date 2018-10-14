@@ -1,25 +1,25 @@
 package com.vicpin.cleanrecyclerview.repository
 
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.ParamCacheDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.ParamCloudDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.SingleParamCacheDataSource
 import io.reactivex.Flowable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by Victor on 20/01/2017.
  */
-class ListRepository<DataEntity, CustomData> constructor(internal var cache: CacheDataSource<DataEntity, CustomData>? = null, internal var cloud: CloudDataSource<DataEntity, CustomData>? = null, var customData: CustomData? = null) : IRepository<DataEntity>  {
+class ListRepository<DataEntity, CustomData> constructor(internal var cache: ParamCacheDataSource<DataEntity, CustomData>? = null, internal var cloud: ParamCloudDataSource<DataEntity, CustomData>? = null, var customData: CustomData? = null) : IRepository<DataEntity> {
 
     override fun getData(currentPage: Int): Flowable<Pair<CRDataSource, List<DataEntity>>> {
-        return if(cloud != null && cache != null) {
-            Flowable.concat(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()), getDataPageFromCloud(currentPage).toFlowable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
-        } else if(cache != null){
+        return if (cloud != null && cache != null) {
+            Flowable.merge(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()), getDataPageFromCloud(currentPage, propagateErrors = false).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
+        } else if (cache != null) {
             getDataFromDisk()
         } else {
-            getDataPageFromCloud(currentPage).toFlowable()
+            getDataPageFromCloud(currentPage, propagateErrors = true)
         }
     }
 
@@ -30,11 +30,23 @@ class ListRepository<DataEntity, CustomData> constructor(internal var cache: Cac
     }
 
 
-    override fun getDataPageFromCloud(currentPage: Int): Single<Pair<CRDataSource, List<DataEntity>>> {
-        return cloud!!.getData(customData)
+    override fun getDataPageFromCloud(currentPage: Int, propagateErrors: Boolean): Flowable<Pair<CRDataSource, List<DataEntity>>> {
+        var result = cloud!!.getData(customData)
                 .doOnSuccess { cache?.clearData() }
                 .doOnSuccess { data -> cache?.saveData(data) }
                 .map { data -> Pair(CRDataSource.CLOUD, data) }
+                .toFlowable()
+
+        if (!propagateErrors) {
+            result = result.onErrorResumeNext { _: Throwable -> Flowable.empty() }
+        }
+
+        if (cache !is SingleParamCacheDataSource) {
+            //If cache returns flowable, cloud datasource does not notify to view about the result, flowable cache already does it
+            result = result.flatMap { _ -> Flowable.empty<Pair<CRDataSource, List<DataEntity>>>() }
+        }
+
+        return result
     }
 
 }
