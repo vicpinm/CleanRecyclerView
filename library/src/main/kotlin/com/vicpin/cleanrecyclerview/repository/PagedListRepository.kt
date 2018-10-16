@@ -48,10 +48,6 @@ class PagedListRepository<DataEntity, CustomData> constructor(internal var cache
             result = result.onErrorResumeNext { _: Throwable -> Flowable.empty() }
         }
 
-        if (cache !is SingleParamCacheDataSource && currentPage == 0) {
-            //If cache returns flowable, cloud datasource does not notify to view about the result, flowable cache already does it
-            result = result.flatMap { _ -> Flowable.empty<Pair<CRDataSource, List<DataEntity>>>() }
-        }
 
         return result
     }

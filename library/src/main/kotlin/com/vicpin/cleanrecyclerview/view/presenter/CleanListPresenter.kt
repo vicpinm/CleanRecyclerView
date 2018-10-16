@@ -62,21 +62,29 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
             itemsLoadedSize += data.size
         }
 
-        if (data.isNotEmpty()) {
-            loadDataIntoView(data)
-        }
-        else if(currentPage == 0){
-            clearDataFromView()
+
+        if(!observableDbMode || source == CRDataSource.DISK) {
+            if (data.isNotEmpty()) {
+                loadDataIntoView(data)
+            } else if (currentPage == 0) {
+                clearDataFromView()
+            }
         }
 
         updateRefreshingWidget(source)
         updateLoadMoreIndicator(source, data.size)
+
+        if(observableDbMode && (!availableDatasources.contains(CRDataSource.CLOUD) || source == CRDataSource.CLOUD)) {
+            //Data feched from cloud, or cloud is not used
+            //In observableDbMode, dataLoadCompleted is not called, so we have to call it manually
+            dataLoadCompleted()
+        }
     }
 
     private fun dataLoadCompleted() {
         mView?.hideRefreshing()
         mView?.hideProgress()
-        mView?.setRefreshEnabled(true)
+        mView?.updateSwipeToRefresh(enabled = true)
 
         if(itemsLoadedSize == 0) {
             showEmptyLayout()
@@ -158,7 +166,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
         mView?.hideRefreshing()
         mView?.hideEmptyLayout()
         mView?.hideErrorLayout()
-        mView?.setRefreshEnabled(true)
+        mView?.updateSwipeToRefresh(enabled = true)
 
         if(isShowingLoadMore){
             mView?.showLoadMoreError()

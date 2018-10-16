@@ -36,7 +36,7 @@ interface ICleanRecyclerView<T> {
 
     fun showHeaderIfEmptyList(): Boolean
 
-    fun setRefreshEnabled(b: Boolean)
+    fun updateSwipeToRefresh(enabled: Boolean)
 
     fun isShowingPlaceholder(): Boolean
 }

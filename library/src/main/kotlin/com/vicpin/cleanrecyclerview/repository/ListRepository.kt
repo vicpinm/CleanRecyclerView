@@ -41,10 +41,6 @@ class ListRepository<DataEntity, CustomData> constructor(internal var cache: Par
             result = result.onErrorResumeNext { _: Throwable -> Flowable.empty() }
         }
 
-        if (cache !is SingleParamCacheDataSource) {
-            //If cache returns flowable, cloud datasource does not notify to view about the result, flowable cache already does it
-            result = result.flatMap { _ -> Flowable.empty<Pair<CRDataSource, List<DataEntity>>>() }
-        }
 
         return result
     }

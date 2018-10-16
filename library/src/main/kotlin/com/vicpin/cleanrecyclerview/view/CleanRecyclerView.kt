@@ -235,7 +235,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             presenter?.refreshData()
             eventListener?.invoke(Event.ON_REFRESH)
         }
-        setRefreshEnabled(refreshEnabled)
+        updateSwipeToRefresh(refreshEnabled)
     }
 
     private fun updateDecoration() {
@@ -266,7 +266,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         hideEmptyLayout()
         hideErrorLayout()
         adapter?.clearData()
-        setRefreshEnabled(false)
+        updateSwipeToRefresh(false)
         progress?.visibility = View.VISIBLE
     }
 
@@ -306,9 +306,15 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         refresh?.isRefreshing = false
     }
 
-    override fun setRefreshEnabled(enabled: Boolean) {
+    override fun updateSwipeToRefresh(enabled: Boolean) {
+        if(refreshEnabled) {
+            refresh?.isEnabled = enabled
+        }
+    }
+
+    fun setRefreshEnabled(enabled: Boolean) {
         refreshEnabled = enabled
-        refresh?.isEnabled = enabled
+        updateSwipeToRefresh(refreshEnabled)
     }
 
     fun onItemClick(listener: ((ViewEntity, ViewHolder<ViewEntity>) -> Unit)) {
