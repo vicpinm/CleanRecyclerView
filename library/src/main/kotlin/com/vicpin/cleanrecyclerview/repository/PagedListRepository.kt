@@ -1,9 +1,8 @@
 package com.vicpin.cleanrecyclerview.repository
 
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.ParamCacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CloudParamPagedDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.SingleParamCacheDataSource
+import com.vicpin.cleanrecyclerview.repository.datasource.ParamCacheDataSource
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -45,7 +44,7 @@ class PagedListRepository<DataEntity, CustomData> constructor(internal var cache
                 .toFlowable()
 
         if (!propagateErrors) {
-            result = result.onErrorResumeNext { _: Throwable -> Flowable.empty() }
+            result = result.onErrorReturn { _: Throwable -> Pair(CRDataSource.CLOUD, listOf()) }
         }
 
 

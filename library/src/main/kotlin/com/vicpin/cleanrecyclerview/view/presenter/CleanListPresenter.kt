@@ -16,6 +16,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     protected var itemsLoadedSize = 0
     protected var currentPage = 0
     private var isShowingLoadMore = false
+    private var firstPageLoadedFromCloud = false
 
     fun init(){
         currentPage = 0
@@ -99,13 +100,15 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
         mView?.hideProgress()
     }
 
+
     private fun updateRefreshingWidget(source : CRDataSource){
 
         if (currentPage == 0) {
-            if (source == CRDataSource.DISK && itemsLoadedSize > 0 && !dataCase.onlyDisk) {
+            if (source == CRDataSource.DISK && itemsLoadedSize > 0 && !dataCase.onlyDisk && !firstPageLoadedFromCloud) {
                 mView?.showRefreshing()
             } else if(source == CRDataSource.CLOUD){
                 mView?.hideRefreshing()
+                firstPageLoadedFromCloud = true
             }
         }
     }
@@ -188,6 +191,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
 
     fun refreshData() {
         currentPage = 0
+        firstPageLoadedFromCloud = false
         fetchData(fromRefresh = true)
     }
 

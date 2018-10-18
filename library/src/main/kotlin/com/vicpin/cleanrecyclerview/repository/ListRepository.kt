@@ -3,7 +3,6 @@ package com.vicpin.cleanrecyclerview.repository
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.ParamCacheDataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.ParamCloudDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.SingleParamCacheDataSource
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -38,7 +37,7 @@ class ListRepository<DataEntity, CustomData> constructor(internal var cache: Par
                 .toFlowable()
 
         if (!propagateErrors) {
-            result = result.onErrorResumeNext { _: Throwable -> Flowable.empty() }
+            result = result.onErrorReturn { _: Throwable -> Pair(CRDataSource.CLOUD, listOf()) }
         }
 
 
