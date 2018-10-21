@@ -9,8 +9,6 @@ interface ParamCacheDataSource<DataEntity, in CustomData> {
 
     fun getData(data: CustomData? = null) : Flowable<List<DataEntity>>
 
-    fun clearData()
-
-    fun saveData(data: List<DataEntity>)
+    fun saveData(clearOldData: Boolean = true, data: List<DataEntity>)
 
 }

@@ -32,7 +32,7 @@ open class ItemCache: CacheDataSource<Item> {
 
     }, BackpressureStrategy.DROP)
 
-    override fun clearData() {
+    private fun clearData() {
         Log.e("aa","cache clear")
         memoryCache.clear()
         subject.onNext(Item("","",""))
@@ -40,7 +40,11 @@ open class ItemCache: CacheDataSource<Item> {
 
 
 
-    override fun saveData(data: List<Item>) {
+    override fun saveData(clearOldData: Boolean, data: List<Item>) {
+        if(clearOldData) {
+            clearData()
+        }
+
         Log.e("aa","cache save ${data.size}")
         memoryCache.addAll(data)
         subject.onNext(Item("","",""))

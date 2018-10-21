@@ -4,19 +4,39 @@ import android.util.Log
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpin.cleanrecyclerview.domain.LoadNextPageCase
 import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
+import com.vicpinm.autosubscription.Unsubscriber
+import com.vicpinm.autosubscription.anotations.AutoSubscription
 import java.util.*
 
 
 /**
  * Created by Victor on 20/01/2017.
  */
-abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerView<ViewEntity>>(val observableDbMode: Boolean, val availableDatasources: List<CRDataSource>) {
+class CleanListPresenter<ViewEntity, DataEntity> (
 
-    var mView: View? = null
+        @AutoSubscription val dataCase: GetDataCase<ViewEntity, DataEntity>,
+
+        @AutoSubscription val loadNextPageCase: LoadNextPageCase<ViewEntity, DataEntity>,
+
+        val observableDbMode: Boolean = false,
+
+        val availableDatasources: MutableList<CRDataSource>,
+
+        val view: ICleanRecyclerView<ViewEntity>
+)
+
+{
+
     protected var itemsLoadedSize = 0
     protected var currentPage = 0
     private var isShowingLoadMore = false
     private var firstPageLoadedFromCloud = false
+
+    var pageLimit = 0
+
+    fun destroyView(){
+        Unsubscriber.unlink(this)
+    }
 
     fun init(){
         currentPage = 0
@@ -26,7 +46,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     fun fetchData(fromRefresh : Boolean = false, onlyDisk : Boolean = false) {
         if(!fromRefresh) {
             showProgress()
-        } else if(itemsLoadedSize == 0 && mView?.isShowingPlaceholder() == false) {
+        } else if(itemsLoadedSize == 0 && view.isShowingPlaceholder() == false) {
             showProgress()
         }
 
@@ -51,12 +71,12 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
         if(currentPage == 0 && source == CRDataSource.DISK && data.isEmpty()) {
             val hadDataBeforeUpdating = itemsLoadedSize > 0
             itemsLoadedSize = 0
-            if(mView?.isShowingPlaceholder() == false) {
+            if(view.isShowingPlaceholder() == false) {
                 if(hadDataBeforeUpdating || onlyCacheMode()) {
-                    mView?.showEmptyLayout()
-                    mView?.hideProgress()
+                    view.showEmptyLayout()
+                    view.hideProgress()
                 } else {
-                    mView?.showProgress()
+                    view.showProgress()
                 }
             }
         } else {
@@ -83,9 +103,9 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     }
 
     private fun dataLoadCompleted() {
-        mView?.hideRefreshing()
-        mView?.hideProgress()
-        mView?.updateSwipeToRefresh(enabled = true)
+        view.hideRefreshing()
+        view.hideProgress()
+        view.updateSwipeToRefresh(enabled = true)
 
         if(itemsLoadedSize == 0) {
             showEmptyLayout()
@@ -93,11 +113,11 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
     }
 
     private fun showEmptyLayout() {
-        mView?.hideErrorLayout()
-        if(mView?.hasHeaders() == false || mView?.showHeaderIfEmptyList() == false) {
-            mView?.showEmptyLayout()
+        view.hideErrorLayout()
+        if(view.hasHeaders() == false || view.showHeaderIfEmptyList() == false) {
+            view.showEmptyLayout()
         }
-        mView?.hideProgress()
+        view.hideProgress()
     }
 
 
@@ -105,28 +125,28 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
 
         if (currentPage == 0) {
             if (source == CRDataSource.DISK && itemsLoadedSize > 0 && !dataCase.onlyDisk && !firstPageLoadedFromCloud) {
-                mView?.showRefreshing()
+                view.showRefreshing()
             } else if(source == CRDataSource.CLOUD){
-                mView?.hideRefreshing()
+                view.hideRefreshing()
                 firstPageLoadedFromCloud = true
             }
         }
     }
 
     private fun loadDataIntoView(data : List<ViewEntity>){
-        mView?.hideEmptyLayout()
-        mView?.hideErrorLayout()
+        view.hideEmptyLayout()
+        view.hideErrorLayout()
         hideProgress()
 
         if (currentPage == 0 || observableDbMode) {
-            mView?.setData(data)
+            view.setData(data)
         } else {
-            mView?.addData(data)
+            view.addData(data)
         }
     }
 
     private fun clearDataFromView(){
-        mView?.setData(ArrayList<ViewEntity>())
+        view.setData(ArrayList<ViewEntity>())
         itemsLoadedSize = 0
     }
 
@@ -139,7 +159,7 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
                 hideLoadMore()
             } else {
                 isShowingLoadMore = true
-                mView?.showLoadMore()
+                view.showLoadMore()
             }
         }
     }
@@ -148,37 +168,37 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
 
     private fun showProgress() {
         if (itemsLoadedSize == 0) {
-            mView?.showProgress()
+            view.showProgress()
         }
     }
 
     private fun hideProgress() {
         if (itemsLoadedSize != 0) {
-            mView?.hideProgress()
+            view.hideProgress()
         }
     }
 
     private fun hideLoadMore(){
         isShowingLoadMore = false
-        mView?.hideLoadMore()
+        view.hideLoadMore()
     }
 
     private fun dataLoadError(ex: Throwable) {
-        mView?.notifyConnectionError()
-        mView?.hideProgress()
-        mView?.hideRefreshing()
-        mView?.hideEmptyLayout()
-        mView?.hideErrorLayout()
-        mView?.updateSwipeToRefresh(enabled = true)
+        view.notifyConnectionError()
+        view.hideProgress()
+        view.hideRefreshing()
+        view.hideEmptyLayout()
+        view.hideErrorLayout()
+        view.updateSwipeToRefresh(enabled = true)
 
         if(isShowingLoadMore){
-            mView?.showLoadMoreError()
+            view.showLoadMoreError()
         }
 
         hideLoadMore()
 
         if(itemsLoadedSize == 0) {
-            mView?.showErrorLayout()
+            view.showErrorLayout()
         }
 
         ex.printStackTrace()
@@ -202,9 +222,5 @@ abstract class CleanListPresenter<ViewEntity, DataEntity, View : ICleanRecyclerV
 
     fun onlyCacheMode() = availableDatasources.size == 1 && availableDatasources.contains(CRDataSource.DISK)
 
-    abstract val dataCase: GetDataCase<ViewEntity, DataEntity>
-    abstract val loadNextPageCase: LoadNextPageCase<ViewEntity, DataEntity>
-
-    abstract val pageLimit: Int
 
 }

@@ -18,10 +18,10 @@ import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpin.cleanrecyclerview.domain.LoadNextPageCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
-import com.vicpin.cleanrecyclerview.repository.PagedListRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.*
 import com.vicpin.cleanrecyclerview.view.interfaces.Mapper
-import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenterImpl
+import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenter
+import com.vicpin.cleanrecyclerview.view.presenter.ICleanRecyclerView
 import com.vicpin.cleanrecyclerview.view.util.DividerDecoration
 import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
 import com.vicpin.kpresenteradapter.PresenterAdapter
@@ -33,7 +33,7 @@ import kotlin.reflect.KClass
  * Created by Victor on 20/01/2017.
  */
 
-open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayout, CleanListPresenterImpl.View<ViewEntity> {
+open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayout, ICleanRecyclerView<ViewEntity> {
 
     //public fields
     var refresh: SwipeRefreshLayout? = null
@@ -62,7 +62,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var empty: FrameLayout? = null
     private var emptyError: FrameLayout? = null
     private var adapter: PresenterAdapter<ViewEntity>? = null
-    private var presenter: CleanListPresenterImpl<ViewEntity, DataEntity>? = null
+    private var presenter: CleanListPresenter<ViewEntity, DataEntity>? = null
     private var clickListener: ((ViewEntity, ViewHolder<ViewEntity>) -> Unit)? = null
     private var inited = false
     private var isAttached = false
@@ -151,7 +151,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
      */
     @JvmOverloads fun <CustomData> loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: CloudParamPagedDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         inited = false
-        val repository = PagedListRepository(cache, cloud, customData)
+        val repository = ListRepository(cache, cloud, customData)
         val useCase = GetDataCase(repository, mapper)
         val nextPageCase = LoadNextPageCase(repository, mapper)
 
@@ -159,8 +159,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         if(cloud != null) availableDatasources.add(CRDataSource.CLOUD)
         if(cache != null) availableDatasources.add(CRDataSource.DISK)
 
-        presenter = CleanListPresenterImpl(useCase, nextPageCase, cache !is SingleParamCacheDataSource, availableDatasources)
-        presenter?.mView = this
+        presenter = CleanListPresenter(useCase, nextPageCase, cache !is SingleParamCacheDataSource, availableDatasources, this)
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
         init()
@@ -187,8 +186,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         if(cloud != null) availableDatasources.add(CRDataSource.CLOUD)
         if(cache != null) availableDatasources.add(CRDataSource.DISK)
 
-        presenter = CleanListPresenterImpl(useCase, nextPageCase, cache !is SingleParamCacheDataSource, availableDatasources)
-        presenter?.mView = this
+        presenter = CleanListPresenter(useCase, nextPageCase, cache !is SingleParamCacheDataSource, availableDatasources, this)
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
         init(paged = false)
