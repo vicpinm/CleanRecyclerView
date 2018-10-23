@@ -16,7 +16,6 @@ import android.widget.*
 import com.pnikosis.materialishprogress.ProgressWheel
 import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
-import com.vicpin.cleanrecyclerview.domain.LoadNextPageCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
 import com.vicpin.cleanrecyclerview.repository.datasource.*
 import com.vicpin.cleanrecyclerview.view.interfaces.Mapper
@@ -70,7 +69,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var cellMargin = 10
     private var emptyLayout: Int = 0
     private var errorLayout: Int = 0
-    private var errorLoadMore: Int = 0
+    private var errorToast: Int = 0
     private var eventListener: ((Event) -> Unit)? = null
     private var wrapInCardView = false
     private var dividerDrawable: Int = 0
@@ -96,7 +95,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             cellMargin = a?.getDimensionPixelSize(R.styleable.CleanRecyclerView_cellMargin, 10) ?: 10
             emptyLayout = a?.getResourceId(R.styleable.CleanRecyclerView_emptyLayout, 0) ?: 0
             errorLayout = a?.getResourceId(R.styleable.CleanRecyclerView_errorLayout, 0) ?: 0
-            errorLoadMore = a?.getResourceId(R.styleable.CleanRecyclerView_errorLoadMore, 0) ?: 0
+            errorToast = a?.getResourceId(R.styleable.CleanRecyclerView_errorToast, 0) ?: 0
             wrapInCardView = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInCardView, false) ?: false
             dividerDrawable = a?.getResourceId(R.styleable.CleanRecyclerView_dividerDrawable, 0) ?: 0
             refreshEnabled = a?.getBoolean(R.styleable.CleanRecyclerView_refreshEnabled, true) ?: true
@@ -151,15 +150,12 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
      */
     @JvmOverloads fun <CustomData> loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: CloudParamPagedDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         inited = false
+
         val repository = ListRepository(cache, cloud, customData)
-        val useCase = GetDataCase(repository, mapper)
-        val nextPageCase = LoadNextPageCase(repository, mapper)
+        val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD) else null
+        val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK) else null
 
-        val availableDatasources = mutableListOf<CRDataSource>()
-        if(cloud != null) availableDatasources.add(CRDataSource.CLOUD)
-        if(cache != null) availableDatasources.add(CRDataSource.DISK)
-
-        presenter = CleanListPresenter(useCase, nextPageCase, cache !is SingleParamCacheDataSource, availableDatasources, this)
+        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, cache !is SingleParamCacheDataSource, this, itemsPerPage, paged = true)
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
         init()
@@ -178,18 +174,15 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
      */
     @JvmOverloads fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: ParamCloudDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         inited = false
+
         val repository = ListRepository(cache, cloud, customData)
-        val useCase = GetDataCase(repository, mapper)
-        val nextPageCase = LoadNextPageCase(repository, mapper)
+        val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD) else null
+        val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK) else null
 
-        val availableDatasources = mutableListOf<CRDataSource>()
-        if(cloud != null) availableDatasources.add(CRDataSource.CLOUD)
-        if(cache != null) availableDatasources.add(CRDataSource.DISK)
-
-        presenter = CleanListPresenter(useCase, nextPageCase, cache !is SingleParamCacheDataSource, availableDatasources, this)
+        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, cache !is SingleParamCacheDataSource, this, itemsPerPage, paged = false)
         this.adapter = adapter
         this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
-        init(paged = false)
+        init()
     }
 
     @JvmOverloads fun <CustomData> loadSingleLine(@LayoutRes layoutResId: Int, cloud: ParamCloudDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
@@ -204,12 +197,10 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         load(adapter, cloud?.newInstance(), cache?.newInstance(), mapper, customData)
     }
 
-    private fun init(paged: Boolean = true) {
+    private fun init() {
         if (!inited && isAttached && adapter != null) {
             setupRecyclerView()
-            presenter?.pageLimit = if (paged) itemsPerPage else 0
             presenter?.init()
-            presenter?.fetchData()
             inited = true
         }
     }
@@ -233,7 +224,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             presenter?.refreshData()
             eventListener?.invoke(Event.ON_REFRESH)
         }
-        updateSwipeToRefresh(refreshEnabled)
+        setRefreshEnabled(refreshEnabled)
     }
 
     private fun updateDecoration() {
@@ -263,8 +254,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     override fun showProgress() {
         hideEmptyLayout()
         hideErrorLayout()
-        adapter?.clearData()
-        updateSwipeToRefresh(false)
+        disableRefreshing()
         progress?.visibility = View.VISIBLE
     }
 
@@ -304,15 +294,25 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         refresh?.isRefreshing = false
     }
 
-    override fun updateSwipeToRefresh(enabled: Boolean) {
+
+    override fun enableRefreshing() {
         if(refreshEnabled) {
-            refresh?.isEnabled = enabled
+            refresh?.isEnabled = true
         }
+    }
+
+    override fun disableRefreshing() {
+        refresh?.isEnabled = false
+
     }
 
     fun setRefreshEnabled(enabled: Boolean) {
         refreshEnabled = enabled
-        updateSwipeToRefresh(refreshEnabled)
+        if(refreshEnabled) {
+            enableRefreshing()
+        } else {
+            disableRefreshing()
+        }
     }
 
     fun onItemClick(listener: ((ViewEntity, ViewHolder<ViewEntity>) -> Unit)) {
@@ -332,7 +332,6 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     fun setItemsPerPage(numItems: Int) {
         this.itemsPerPage = numItems
-        presenter?.pageLimit = numItems
     }
 
     fun setEmptyLayout(@LayoutRes layoutRes: Int) {
@@ -345,8 +344,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         loadErrorLayout()
     }
 
-    fun setErrorLoadMore(@StringRes stringRes: Int) {
-        this.errorLoadMore = stringRes
+    fun setErrorToast(@StringRes stringRes: Int) {
+        this.errorToast = stringRes
     }
 
     fun setShowHeaderIfEmptyList(showHeader: Boolean) {
@@ -401,9 +400,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         eventListener?.invoke(Event.CONNECTION_ERROR)
     }
 
-    override fun showLoadMoreError() {
-        if (errorLoadMore > 0) {
-            Toast.makeText(context, errorLoadMore, Toast.LENGTH_SHORT).show()
+    override fun showErrorToast() {
+        if (errorToast > 0) {
+            Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
         }
     }
 

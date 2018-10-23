@@ -5,7 +5,7 @@
         <attr name="cellMargin" format="dimension"/>
         <attr name="emptyLayout" format="reference" />
         <attr name="errorLayout" format="reference" />
-        <attr name="errorLoadMore" format="string" />
+        <attr name="errorToast" format="string" />
         <attr name="wrapInCardView" format="boolean" />
         <attr name="dividerDrawable" format="reference" />
         <attr name="refreshEnabled" format="boolean" />

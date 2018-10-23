@@ -1,12 +1,8 @@
 package com.vicpin.cleanrecyclerview.view.presenter
 
-import android.util.Log
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
-import com.vicpin.cleanrecyclerview.domain.LoadNextPageCase
-import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
 import com.vicpinm.autosubscription.Unsubscriber
 import com.vicpinm.autosubscription.anotations.AutoSubscription
-import java.util.*
 
 
 /**
@@ -14,25 +10,23 @@ import java.util.*
  */
 class CleanListPresenter<ViewEntity, DataEntity> (
 
-        @AutoSubscription val dataCase: GetDataCase<ViewEntity, DataEntity>,
+        @AutoSubscription val getCachedDataCase: GetDataCase<ViewEntity, DataEntity>?,
 
-        @AutoSubscription val loadNextPageCase: LoadNextPageCase<ViewEntity, DataEntity>,
+        @AutoSubscription val getCloudDataCase: GetDataCase<ViewEntity, DataEntity>?,
 
         val observableDbMode: Boolean = false,
 
-        val availableDatasources: MutableList<CRDataSource>,
+        val view: ICleanRecyclerView<ViewEntity>,
 
-        val view: ICleanRecyclerView<ViewEntity>
+        val pageLimit: Int = 0,
+
+        val paged: Boolean
 )
-
 {
 
-    protected var itemsLoadedSize = 0
-    protected var currentPage = 0
-    private var isShowingLoadMore = false
-    private var firstPageLoadedFromCloud = false
-
-    var pageLimit = 0
+    private var currentPage = 0
+    var itemsLoadedSize = 0
+    private var cloudDataSourceInvoked = false
 
     fun destroyView(){
         Unsubscriber.unlink(this)
@@ -40,187 +34,154 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
     fun init(){
         currentPage = 0
-        hideLoadMore()
+        itemsLoadedSize = 0
+        fetchData()
     }
 
-    fun fetchData(fromRefresh : Boolean = false, onlyDisk : Boolean = false) {
-        if(!fromRefresh) {
-            showProgress()
-        } else if(itemsLoadedSize == 0 && view.isShowingPlaceholder() == false) {
-            showProgress()
-        }
-
-        dataCase.onlyDisk = onlyDisk
-        executeUseCase()
+    private fun fetchData() {
+        getCachedDataCase?.let { fetchCachedData(it, fetchCloudDataAfter = true) }
+        ?: getCloudDataCase?.let { fetchCloudData(it) }
     }
 
-    private fun executeUseCase() {
-        if(currentPage > 0 && observableDbMode) {
-            loadNextPageCase.currentPage = currentPage
-            loadNextPageCase.execute({ result -> updateLoadMoreIndicator(result.first, result.second.size) }) //Results will be propagated throw dataCase, as we are in observableDbMode
-        } else {
-            dataCase.currentPage = currentPage
-            dataCase.execute({ result -> onDataFetched(result.first, result.second) },
-                    { dataLoadError(it) },
-                    { dataLoadCompleted() })
-        }
-    }
+    private fun fetchCachedData(dataCase: GetDataCase<ViewEntity, DataEntity>, fetchCloudDataAfter: Boolean) {
+        showProgressPlaceholderIfNeeded()
 
-    private fun onDataFetched(source: CRDataSource, data: List<ViewEntity>) {
-        Log.e("aa","source $source size ${data.size}")
-        if(currentPage == 0 && source == CRDataSource.DISK && data.isEmpty()) {
-            val hadDataBeforeUpdating = itemsLoadedSize > 0
-            itemsLoadedSize = 0
-            if(view.isShowingPlaceholder() == false) {
-                if(hadDataBeforeUpdating || onlyCacheMode()) {
-                    view.showEmptyLayout()
-                    view.hideProgress()
-                } else {
-                    view.showProgress()
+        dataCase.execute(onNext =  {
+            onCachedDataReceived(it)
+            //After receiving disk data, fetch cloud data
+            if(fetchCloudDataAfter && !cloudDataSourceInvoked) {
+                getCloudDataCase?.let {
+                    cloudDataSourceInvoked = true
+                    fetchCloudData(it)
                 }
             }
-        } else {
-            itemsLoadedSize += data.size
+        })
+    }
+
+
+    private fun fetchCloudData(dataCase: GetDataCase<ViewEntity, DataEntity>) {
+        showProgressPlaceholderIfNeeded()
+
+        if(itemsLoadedSize > 0) {
+            view.showRefreshing()
+        }
+        dataCase.with(page = currentPage).execute(
+                onNext = { onCloudDataReceived(it)  },
+                onError = { onCloudErrorReceived() })
+    }
+
+    private fun onCachedDataReceived(result: List<ViewEntity>) {
+        view.setData(result)
+        view.enableRefreshing()
+
+        itemsLoadedSize = result.size
+
+        if(itemsLoadedSize == 0 && getCloudDataCase == null) {
+            showEmptyLayout()
+        } else if(itemsLoadedSize > 0) {
+            view.hideProgress()
+            view.hideEmptyLayout()
+            view.hideErrorLayout()
         }
 
-
-        if(!observableDbMode || source == CRDataSource.DISK) {
-            if (data.isNotEmpty()) {
-                loadDataIntoView(data)
-            } else if (currentPage == 0) {
-                clearDataFromView()
-            }
-        }
-
-        updateRefreshingWidget(source)
-        updateLoadMoreIndicator(source, data.size)
-
-        if(observableDbMode && (!availableDatasources.contains(CRDataSource.CLOUD) || source == CRDataSource.CLOUD)) {
-            //Data feched from cloud, or cloud is not used
-            //In observableDbMode, dataLoadCompleted is not called, so we have to call it manually
-            dataLoadCompleted()
+        if(observableDbMode) {
+            updatePageIndicator()
         }
     }
 
-    private fun dataLoadCompleted() {
-        view.hideRefreshing()
+    private fun onCloudDataReceived(result: List<ViewEntity>) {
+        if(!observableDbMode) {
+            //In observableDbMode, data is updated throw db notificaions, so ignore cloud notifications
+            if(currentPage == 0) {
+                view.setData(result)
+                itemsLoadedSize = result.size
+            } else {
+                view.addData(result)
+                itemsLoadedSize += result.size
+            }
+
+            updatePageIndicator()
+        }
+
         view.hideProgress()
-        view.updateSwipeToRefresh(enabled = true)
+        view.hideRefreshing()
+        view.hideErrorLayout()
+        view.hideLoadMore()
+        view.enableRefreshing()
 
         if(itemsLoadedSize == 0) {
             showEmptyLayout()
         }
+
     }
+
+    private fun onCloudErrorReceived() {
+        view.hideProgress()
+        view.hideRefreshing()
+        view.notifyConnectionError()
+        view.enableRefreshing()
+
+        if (itemsLoadedSize == 0) {
+            view.hideEmptyLayout()
+            view.showErrorLayout()
+        } else {
+            view.showErrorToast()
+        }
+
+        if (currentPage > 0) {
+            currentPage--
+        }
+
+
+    }
+
 
     private fun showEmptyLayout() {
         view.hideErrorLayout()
-        if(view.hasHeaders() == false || view.showHeaderIfEmptyList() == false) {
+        if(!view.hasHeaders() || !view.showHeaderIfEmptyList()) {
             view.showEmptyLayout()
         }
         view.hideProgress()
     }
 
-
-    private fun updateRefreshingWidget(source : CRDataSource){
-
-        if (currentPage == 0) {
-            if (source == CRDataSource.DISK && itemsLoadedSize > 0 && !dataCase.onlyDisk && !firstPageLoadedFromCloud) {
-                view.showRefreshing()
-            } else if(source == CRDataSource.CLOUD){
-                view.hideRefreshing()
-                firstPageLoadedFromCloud = true
-            }
-        }
-    }
-
-    private fun loadDataIntoView(data : List<ViewEntity>){
-        view.hideEmptyLayout()
-        view.hideErrorLayout()
-        hideProgress()
-
-        if (currentPage == 0 || observableDbMode) {
-            view.setData(data)
-        } else {
-            view.addData(data)
-        }
-    }
-
-    private fun clearDataFromView(){
-        view.setData(ArrayList<ViewEntity>())
-        itemsLoadedSize = 0
-    }
-
-    private fun updateLoadMoreIndicator(source: CRDataSource, itemsLoaded: Int) {
-
-        if (source == CRDataSource.DISK && !observableDbMode) {
-            hideLoadMore()
-        } else {
-            if (pageLimit == 0 || itemsLoaded < pageLimit) {
-                hideLoadMore()
-            } else {
-                isShowingLoadMore = true
-                view.showLoadMore()
-            }
-        }
-    }
-
-
-
-    private fun showProgress() {
-        if (itemsLoadedSize == 0) {
+    private fun showProgressPlaceholderIfNeeded() {
+        if(itemsLoadedSize == 0 && !view.isShowingPlaceholder()) {
             view.showProgress()
+            view.disableRefreshing()
         }
     }
 
-    private fun hideProgress() {
-        if (itemsLoadedSize != 0) {
-            view.hideProgress()
+    private fun updatePageIndicator() {
+        if(paged && itemsLoadedSize > 0 && (pageLimit == 0 || (itemsLoadedSize >= (currentPage + 1) * pageLimit))) {
+            view.showLoadMore()
+        } else {
+            view.hideLoadMore()
         }
     }
 
-    private fun hideLoadMore(){
-        isShowingLoadMore = false
-        view.hideLoadMore()
+    fun refreshCache() {
+        if(!observableDbMode && getCachedDataCase != null) {
+            fetchCachedData(getCachedDataCase, fetchCloudDataAfter = false)
+        }
     }
 
-    private fun dataLoadError(ex: Throwable) {
-        view.notifyConnectionError()
-        view.hideProgress()
-        view.hideRefreshing()
-        view.hideEmptyLayout()
-        view.hideErrorLayout()
-        view.updateSwipeToRefresh(enabled = true)
-
-        if(isShowingLoadMore){
-            view.showLoadMoreError()
+    fun refreshData() {
+        if(getCloudDataCase != null) {
+            currentPage = 0
+            view.hideLoadMore()
+            fetchCloudData(getCloudDataCase)
+        } else {
+            refreshCache()
         }
 
-        hideLoadMore()
-
-        if(itemsLoadedSize == 0) {
-            view.showErrorLayout()
-        }
-
-        ex.printStackTrace()
     }
 
     fun loadNextPage() {
         currentPage++
-        fetchData()
+        if(getCloudDataCase != null) {
+            fetchCloudData(getCloudDataCase)
+        }
     }
-
-    fun refreshData() {
-        currentPage = 0
-        firstPageLoadedFromCloud = false
-        fetchData(fromRefresh = true)
-    }
-
-    fun refreshCache() {
-        currentPage = 0
-        fetchData(fromRefresh = true, onlyDisk = true)
-    }
-
-    fun onlyCacheMode() = availableDatasources.size == 1 && availableDatasources.contains(CRDataSource.DISK)
 
 
 }

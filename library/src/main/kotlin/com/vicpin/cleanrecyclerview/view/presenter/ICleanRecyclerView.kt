@@ -26,7 +26,7 @@ interface ICleanRecyclerView<T> {
 
     fun showErrorLayout()
 
-    fun showLoadMoreError()
+    fun showErrorToast()
 
     fun hideErrorLayout()
 
@@ -36,7 +36,9 @@ interface ICleanRecyclerView<T> {
 
     fun showHeaderIfEmptyList(): Boolean
 
-    fun updateSwipeToRefresh(enabled: Boolean)
+    fun enableRefreshing()
+
+    fun disableRefreshing()
 
     fun isShowingPlaceholder(): Boolean
 }

@@ -35,7 +35,6 @@ open class ItemCache: CacheDataSource<Item> {
     private fun clearData() {
         Log.e("aa","cache clear")
         memoryCache.clear()
-        subject.onNext(Item("","",""))
     }
 
 

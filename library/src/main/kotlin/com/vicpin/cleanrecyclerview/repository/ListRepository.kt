@@ -10,40 +10,17 @@ import io.reactivex.schedulers.Schedulers
 /**
  * Created by Victor on 20/01/2017.
  */
-class ListRepository<DataEntity, CustomData> constructor(internal var cache: ParamCacheDataSource<DataEntity, CustomData>? = null, internal var cloud: CloudParamPagedDataSource<DataEntity, CustomData>? = null, var customData: CustomData? = null) : IRepository<DataEntity> {
+class ListRepository<DataEntity, CustomData> constructor(internal var cache: ParamCacheDataSource<DataEntity, CustomData>? = null, internal var cloud: CloudParamPagedDataSource<DataEntity, CustomData>? = null, var customData: CustomData? = null) {
 
-    override fun getData(currentPage: Int): Flowable<Pair<CRDataSource, List<DataEntity>>> {
-        return if (cloud != null && cache != null) {
-            if (currentPage == 0) {
-                Flowable.merge(getDataFromDisk().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()), getDataPageFromCloud(currentPage, propagateErrors = false).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()))
-            } else {
-                getDataPageFromCloud(currentPage, propagateErrors = false)
-            }
-        } else if (cache != null) {
-            getDataFromDisk()
-        } else {
-            getDataPageFromCloud(currentPage, propagateErrors = true)
-        }
+
+    fun getDataFromDisk(): Flowable<List<DataEntity>> {
+        return cache!!.getData(customData)
     }
 
-    override fun getDataFromDisk(): Flowable<Pair<CRDataSource, List<DataEntity>>> {
-        return cache!!.getData(customData).map { list ->
-            Pair(CRDataSource.DISK, list)
-        }
-    }
-
-    override fun getDataPageFromCloud(currentPage: Int, propagateErrors: Boolean): Flowable<Pair<CRDataSource, List<DataEntity>>> {
-        var result =  cloud!!.getData(currentPage, customData)
+    fun getDataPageFromCloud(currentPage: Int): Flowable<List<DataEntity>> {
+        return cloud!!.getData(currentPage, customData)
                 .doOnSuccess { data -> cache?.saveData(clearOldData = currentPage == 0, data = data) }
-                .map { data -> Pair(CRDataSource.CLOUD, data) }
                 .toFlowable()
-
-        if (!propagateErrors) {
-            result = result.onErrorReturn { _: Throwable -> Pair(CRDataSource.CLOUD, listOf()) }
-        }
-
-
-        return result
     }
 
 }
