@@ -39,7 +39,7 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <com.pnikosis.materialishprogress.ProgressWheel
+    <android.support.v4.widget.ContentLoadingProgressBar
         android:id="@+id/progress"
         android:layout_width="45dp"
         android:layout_height="45dp"
@@ -48,9 +48,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_centerInParent="true"
-        app:matProg_barColor="?attr/colorPrimary"
-        app:matProg_barWidth="3dp"
-        app:matProg_progressIndeterminate="true"/>
+        android:indeterminate="true"
+        android:indeterminateTint="?attr/colorPrimary"/>
 
 
 </RelativeLayout>

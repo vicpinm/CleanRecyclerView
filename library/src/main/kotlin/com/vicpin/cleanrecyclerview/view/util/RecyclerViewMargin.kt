@@ -11,7 +11,7 @@ import android.view.View
 class RecyclerViewMargin(val margin: Int, val columns : Int = 1, val orientation : Int = LinearLayoutManager.VERTICAL) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect, view: View,
-                                parent: RecyclerView, state: RecyclerView.State?) {
+                                parent: RecyclerView, state: RecyclerView.State) {
 
         val position = parent.getChildLayoutPosition(view)
 

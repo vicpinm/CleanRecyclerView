@@ -45,9 +45,6 @@ class DividerDecoration(context: Context, orientation: Int) : RecyclerView.ItemD
      * @param drawable Drawable that should be used as a divider.
      */
     fun setDrawable(drawable: Drawable) {
-        if (drawable == null) {
-            throw IllegalArgumentException("Drawable cannot be null.")
-        }
         mDivider = drawable
     }
 
@@ -105,7 +102,7 @@ class DividerDecoration(context: Context, orientation: Int) : RecyclerView.ItemD
         val childCount = parent.getChildCount()
         for (i in 0..childCount - 1) {
             val child = parent.getChildAt(i)
-            parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds)
+            parent.layoutManager?.getDecoratedBoundsWithMargins(child, mBounds)
             val right = mBounds.right + Math.round(ViewCompat.getTranslationX(child))
             val left = right - mDivider!!.intrinsicWidth
             mDivider!!.setBounds(left, top, right, bottom)
