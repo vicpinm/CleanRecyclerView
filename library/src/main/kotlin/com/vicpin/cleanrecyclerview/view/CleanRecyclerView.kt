@@ -13,7 +13,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.pnikosis.materialishprogress.ProgressWheel
 import com.vicpin.cleanrecyclerview.R
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpin.cleanrecyclerview.repository.ListRepository
@@ -57,7 +56,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     //private fields
-    private var progress: ProgressWheel? = null
+    private var progress: ProgressBar? = null
     private var empty: FrameLayout? = null
     private var emptyError: FrameLayout? = null
     private var adapter: PresenterAdapter<ViewEntity>? = null
@@ -139,6 +138,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         empty = findViewById(R.id.empty)
         emptyError = findViewById(R.id.emptyError)
         recyclerView = findViewById(R.id.recyclerListView)
+        this.adapter?.notifyScrollStopped(recyclerView!!)
 
         if(wrapInNestedScroll) {
             recyclerView?.isNestedScrollingEnabled = false
@@ -228,17 +228,17 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     private fun updateDecoration() {
-        recyclerView?.removeItemDecoration(itemDecoration)
+        itemDecoration?.let { recyclerView?.removeItemDecoration(it) }
         if (layoutManager is GridLayoutManager) {
             itemDecoration = RecyclerViewMargin(cellMargin, (layoutManager as GridLayoutManager).spanCount, (layoutManager as GridLayoutManager).orientation)
         } else if (layoutManager is LinearLayoutManager) {
             itemDecoration = RecyclerViewMargin(cellMargin, 1, (layoutManager as LinearLayoutManager).orientation)
         }
-        recyclerView?.addItemDecoration(itemDecoration)
+        itemDecoration?.let { recyclerView?.addItemDecoration(it) }
 
         if (dividerDrawable > 0 && layoutManager is LinearLayoutManager) {
             val divider = DividerDecoration(context, (layoutManager as LinearLayoutManager).orientation)
-            divider.setDrawable(ContextCompat.getDrawable(context, dividerDrawable))
+            ContextCompat.getDrawable(context, dividerDrawable)?.let { divider.setDrawable(it) }
             recyclerView?.addItemDecoration(divider)
         }
     }
@@ -412,7 +412,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     fun addScrollListener(onScroll: ((Int) -> Unit)? = null, onStop: ((Int) -> Unit)? = null) {
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING || newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
                     //Do nothing
@@ -421,7 +421,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
                 }
             }
 
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 overallYScroll += dy
                 if(dy > 0) {
