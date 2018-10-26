@@ -17,16 +17,23 @@ constructor(
         val source: CRDataSource) : CRUseCase<List<ViewEntity>>() {
 
     var page: Int = 0
+    var requestInProgress = false
 
     fun with(page: Int) = apply { this.page = page }
 
     override fun buildUseCase(): Flowable<List<ViewEntity>> {
+        requestInProgress = true
+
         val dataSource = when(source) {
             CRDataSource.DISK -> repository.getDataFromDisk()
             CRDataSource.CLOUD -> repository.getDataPageFromCloud(page)
         }
 
         return dataSource.map { transformData(it) }
+                .doOnNext { requestInProgress = false }
+                .doOnCancel { requestInProgress = false }
+                .doOnError { requestInProgress = false }
+                .doOnComplete { requestInProgress = false }
 
     }
 
