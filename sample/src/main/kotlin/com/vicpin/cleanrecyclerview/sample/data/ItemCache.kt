@@ -1,5 +1,7 @@
 package com.vicpin.cleanrecyclerview.sample.data
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.vicpin.cleanrecyclerview.annotation.DataSource
 import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
@@ -24,6 +26,14 @@ open class ItemCache: CacheDataSource<Item> {
             Log.e("aa","emitiendo subject ${memoryCache.size}")
             emmiter.onNext(memoryCache)
 
+            Handler(Looper.getMainLooper()).postDelayed({
+                if(memoryCache.size > 0) {
+                    memoryCache.removeAt(memoryCache.size - 1)
+                    subject.onNext(Item("","",""))
+
+                }
+            },3000)
+
         }
 
         Log.e("aa","emitiendo ${memoryCache.size}")
@@ -44,7 +54,7 @@ open class ItemCache: CacheDataSource<Item> {
             clearData()
         }
 
-        Log.e("aa","cache save ${data.size}")
+        Log.e("aaa","cache save ${data.size}")
         memoryCache.addAll(data)
         subject.onNext(Item("","",""))
     }

@@ -1,5 +1,6 @@
 package com.vicpin.cleanrecyclerview.view.presenter
 
+import android.util.Log
 import com.vicpin.cleanrecyclerview.domain.GetDataCase
 import com.vicpinm.autosubscription.Unsubscriber
 import com.vicpinm.autosubscription.anotations.AutoSubscription
@@ -76,7 +77,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
         itemsLoadedSize = result.size
 
-        if(itemsLoadedSize == 0 && getCloudDataCase?.requestInProgress == false) {
+        if(itemsLoadedSize == 0 && getCloudDataCase?.isInProgress == false) {
             showEmptyLayout()
         } else if(itemsLoadedSize > 0) {
             view.hideProgress()
@@ -90,6 +91,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     }
 
     private fun onCloudDataReceived(result: List<ViewEntity>) {
+        getCloudDataCase?.unsubscribe()
+
         if(!observableDbMode) {
             //In observableDbMode, data is updated throw db notificaions, so ignore cloud notifications
             if(currentPage == 0) {
@@ -102,6 +105,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
             updatePageIndicator()
         }
+
+        val inprogress = getCloudDataCase?.isInProgress
 
         view.hideProgress()
         view.hideRefreshing()
@@ -116,6 +121,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     }
 
     private fun onCloudErrorReceived() {
+        getCloudDataCase?.unsubscribe()
+
         view.hideProgress()
         view.hideRefreshing()
         view.notifyConnectionError()

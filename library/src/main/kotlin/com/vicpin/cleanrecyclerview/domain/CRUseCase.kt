@@ -17,6 +17,8 @@ abstract class CRUseCase<T> : UnsubscribeListener {
     private var onError: ((Throwable) -> Unit)? = null
     private var onComplete: (() -> Unit)? = null
     private var subscriber: DisposableSubscriber<T>? = null
+    var isInProgress = false
+        get() { return subscriber != null }
 
 
     fun execute(onNext: ((T) -> Unit)?  = null, onError: ((Throwable) -> Unit)?  = null, onComplete: (() -> Unit)? = null) {
