@@ -77,7 +77,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
         itemsLoadedSize = result.size
 
-        if(itemsLoadedSize == 0 && getCloudDataCase?.isInProgress == false) {
+        if(itemsLoadedSize == 0 && (getCloudDataCase == null || (cloudDataSourceInvoked && !getCloudDataCase.isInProgress))) {
             showEmptyLayout()
         } else if(itemsLoadedSize > 0) {
             view.hideProgress()
