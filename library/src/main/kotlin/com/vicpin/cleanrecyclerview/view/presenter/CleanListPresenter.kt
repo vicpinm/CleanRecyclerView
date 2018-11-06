@@ -77,6 +77,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
         itemsLoadedSize = result.size
 
+
+
         if(itemsLoadedSize == 0 && (getCloudDataCase == null || (cloudDataSourceInvoked && !getCloudDataCase.isInProgress))) {
             showEmptyLayout()
         } else if(itemsLoadedSize > 0) {
@@ -92,7 +94,6 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
     private fun onCloudDataReceived(result: List<ViewEntity>) {
         getCloudDataCase?.unsubscribe()
-
         if(!observableDbMode) {
             //In observableDbMode, data is updated throw db notificaions, so ignore cloud notifications
             if(currentPage == 0) {
@@ -106,15 +107,13 @@ class CleanListPresenter<ViewEntity, DataEntity> (
             updatePageIndicator()
         }
 
-        val inprogress = getCloudDataCase?.isInProgress
-
         view.hideProgress()
         view.hideRefreshing()
         view.hideErrorLayout()
         view.hideLoadMore()
         view.enableRefreshing()
 
-        if(itemsLoadedSize == 0) {
+        if(itemsLoadedSize == 0 && result.isEmpty()) {
             showEmptyLayout()
         }
 
@@ -132,7 +131,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
         if (itemsLoadedSize == 0) {
             view.hideEmptyLayout()
             view.showErrorLayout()
-        } else {
+        } else if(itemsLoadedSize > 0){
+            //Show toast on top of data
             view.showErrorToast()
         }
 
@@ -145,6 +145,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
 
     private fun showEmptyLayout() {
+
         view.hideErrorLayout()
         if(!view.hasHeaders() || !view.showHeaderIfEmptyList()) {
             view.showEmptyLayout()
