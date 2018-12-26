@@ -21,3 +21,8 @@ dependencies {
 }
   ```
   
+  <p align="center">
+  <img src ="/uml_diagram.png" />
+</p>
+
+  
