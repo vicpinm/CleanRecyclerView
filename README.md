@@ -22,7 +22,7 @@ dependencies {
   ```
   
   <p align="center">
-  <img src ="/uml_diagram.png" />
+  <img src ="/diagram.png" />
 </p>
 
   
