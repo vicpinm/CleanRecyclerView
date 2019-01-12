@@ -1,6 +1,6 @@
 package com.vicpin.cleanrecyclerview.util;
 
-import android.support.annotation.IdRes;
+import androidx.annotation.IdRes;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.PerformException;
 import android.support.test.espresso.UiController;
@@ -9,7 +9,7 @@ import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.espresso.util.HumanReadables;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import com.vicpin.cleanrecyclerview.sample.R;

@@ -6,14 +6,13 @@ apply from: 'maven-push.gradle'
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
-
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {
@@ -32,21 +31,21 @@ android {
 ext {
     support = "28.0.0"
     materialish = "1.7"
-    presenter_adapter = "2.0.7"
+    presenter_adapter = "3.0.0beta1"
     autosubscription = '1.0.2'
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "com.android.support:appcompat-v7:$support"
-    implementation "com.android.support:cardview-v7:$support"
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     testCompile 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation "com.android.support:design:$support"
-    implementation "com.android.support:recyclerview-v7:$support"
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
     // Rx Android
     api 'io.reactivex.rxjava2:rxjava:2.1.16'

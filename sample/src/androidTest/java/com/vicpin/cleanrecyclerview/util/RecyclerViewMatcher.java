@@ -3,7 +3,7 @@ package com.vicpin.cleanrecyclerview.util;
 import android.content.res.Resources;
 import android.support.test.espresso.PerformException;
 import android.support.test.espresso.util.HumanReadables;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import org.hamcrest.Description;

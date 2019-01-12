@@ -3,9 +3,8 @@ package com.vicpin.cleanrecyclerview.sample.view.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
-import butterknife.ButterKnife
 import com.vicpin.cleanrecyclerview.sample.R
 import com.vicpin.cleanrecyclerview.sample.extensions.load
 import com.vicpin.cleanrecyclerview.sample.extensions.startActivityWithTransition
@@ -30,8 +29,6 @@ class DetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
-        ButterKnife.bind(this)
-
         initView()
     }
 
