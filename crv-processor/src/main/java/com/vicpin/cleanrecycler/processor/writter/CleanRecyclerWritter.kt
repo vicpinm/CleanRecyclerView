@@ -1,7 +1,7 @@
 package com.vicpin.cleanrecycler.processor.writter
 
-import com.vicpin.cleanrecyclerview.annotation.processor.entity.MapperClass
-import com.vicpin.cleanrecyclerview.processor.model.CleanRecyclerClass
+import com.vicpin.cleanrecycler.annotation.processor.entity.MapperClass
+import com.vicpin.cleanrecycler.processor.model.CleanRecyclerClass
 import javax.annotation.processing.ProcessingEnvironment
 
 
@@ -25,7 +25,7 @@ class CleanRecyclerWritter {
     fun generateImports(model: CleanRecyclerClass) {
         writter.writeImport("import android.content.Context")
         writter.writeImport("import android.content.Intent")
-        writter.writeImport("import com.vicpin.cleanrecyclerview.view.CleanRecyclerView")
+        writter.writeImport("import com.vicpin.cleanrecycler.view.CleanRecyclerView")
         writter.writeImport("import android.util.AttributeSet")
         writter.writeImport("import com.vicpin.kpresenteradapter.PresenterAdapter")
         if(viewEntityName.isNotBlank()) writter.writeImport("import $viewEntityName")

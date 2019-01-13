@@ -1,11 +1,12 @@
-package com.vicpin.cleanrecyclerview.sample.data
+package com.vicpin.cleanrecycler.sample.data
 
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.vicpin.cleanrecycler.repository.datasource.CacheDataSource
+import com.vicpin.cleanrecycler.sample.model.Item
 import com.vicpin.cleanrecyclerview.annotation.DataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource
-import com.vicpin.cleanrecyclerview.sample.model.Item
+
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.PublishSubject

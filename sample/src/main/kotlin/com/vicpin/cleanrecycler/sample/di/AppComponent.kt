@@ -1,7 +1,8 @@
-package com.vicpin.cleanrecyclerview.sample.di
+package com.vicpin.cleanrecycler.sample.di
 
 import android.app.Application
-import com.vicpin.cleanrecyclerview.sample.view.activity.MainActivity
+import com.vicpin.cleanrecycler.sample.view.activity.MainActivity
+
 import dagger.Component
 import javax.inject.Singleton
 

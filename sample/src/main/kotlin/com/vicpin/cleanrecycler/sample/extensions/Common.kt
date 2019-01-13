@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.sample.extensions
+package com.vicpin.cleanrecycler.sample.extensions
 
 import android.app.Activity
 import android.content.Context
@@ -12,8 +12,9 @@ import android.util.DisplayMetrics
 import android.view.View
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
-import com.vicpin.cleanrecyclerview.sample.Application
-import com.vicpin.cleanrecyclerview.sample.di.AppComponent
+import com.vicpin.cleanrecycler.sample.Application
+import com.vicpin.cleanrecycler.sample.di.AppComponent
+
 
 /**
  * Created by victor on 21/1/17.

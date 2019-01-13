@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.view.interfaces
+package com.vicpin.cleanrecycler.view.interfaces
 
 /**
  * Created by Oesia on 22/01/2018.

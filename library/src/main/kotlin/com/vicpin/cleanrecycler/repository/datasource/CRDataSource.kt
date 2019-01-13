@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.repository.datasource
+package com.vicpin.cleanrecycler.repository.datasource
 
 /**
  * Created by Victor on 20/01/2017.

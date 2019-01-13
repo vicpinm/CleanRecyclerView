@@ -1,7 +1,7 @@
 package com.vicpin.cleanrecycler.processor.model
 
-import com.vicpin.cleanrecyclerview.annotation.processor.entity.MapperClass
-import com.vicpin.cleanrecyclerview.processor.util.EnvironmentUtil
+import com.vicpin.cleanrecycler.annotation.processor.entity.MapperClass
+import com.vicpin.cleanrecycler.processor.util.EnvironmentUtil
 
 /**
  * Created by victor on 23/4/18.

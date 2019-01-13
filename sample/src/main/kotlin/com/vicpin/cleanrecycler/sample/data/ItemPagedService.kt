@@ -1,9 +1,9 @@
-package com.vicpin.cleanrecyclerview.sample.data
+package com.vicpin.cleanrecycler.sample.data
 
 import android.util.Log
+import com.vicpin.cleanrecycler.repository.datasource.CloudPagedDataSource
+import com.vicpin.cleanrecycler.sample.model.Item
 import com.vicpin.cleanrecyclerview.annotation.DataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource
-import com.vicpin.cleanrecyclerview.sample.model.Item
 import io.reactivex.Single
 import io.reactivex.SingleSource
 import java.io.IOException

@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.sample.model
+package com.vicpin.cleanrecycler.sample.model
 
 import java.io.Serializable
 

@@ -1,7 +1,8 @@
-package com.vicpin.cleanrecyclerview.view
+package com.vicpin.cleanrecycler.view
 
 import android.content.Context
 import android.util.AttributeSet
+import com.vicpin.cleanrecycler.view.CleanRecyclerView
 
 /**
  * Created by Victor on 20/01/2017.

@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.sample.view.activity
+package com.vicpin.cleanrecycler.sample.view.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,16 +6,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
-import com.vicpin.cleanrecyclerview.sample.R
-import com.vicpin.cleanrecyclerview.sample.data.ItemCache
-import com.vicpin.cleanrecyclerview.sample.data.ItemPagedService
-import com.vicpin.cleanrecyclerview.sample.data.ItemService
-import com.vicpin.cleanrecyclerview.sample.extensions.injector
-import com.vicpin.cleanrecyclerview.sample.model.Item
-import com.vicpin.cleanrecyclerview.sample.model.Mapper
-import com.vicpin.cleanrecyclerview.sample.view.adapter.AdapterItemView
-import com.vicpin.cleanrecyclerview.view.CleanRecyclerView
-import com.vicpin.cleanrecyclerview.view.SimpleCleanRecyclerView
+import com.vicpin.cleanrecycler.sample.data.ItemCache
+import com.vicpin.cleanrecycler.sample.data.ItemPagedService
+import com.vicpin.cleanrecycler.sample.extensions.injector
+import com.vicpin.cleanrecycler.sample.view.activity.DetailActivity
+import com.vicpin.cleanrecycler.sample.view.adapter.AdapterItemView
+import com.vicpin.cleanrecycler.view.CleanRecyclerView
+import com.vicpin.cleanrecycler.view.SimpleCleanRecyclerView
+import com.vicpin.cleanrecycler.sample.R
+import com.vicpin.cleanrecycler.sample.model.Item
+import com.vicpin.cleanrecycler.sample.model.Mapper
+
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 

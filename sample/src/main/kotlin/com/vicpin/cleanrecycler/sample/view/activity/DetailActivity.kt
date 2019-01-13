@@ -1,14 +1,15 @@
-package com.vicpin.cleanrecyclerview.sample.view.activity
+package com.vicpin.cleanrecycler.sample.view.activity
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
-import com.vicpin.cleanrecyclerview.sample.R
-import com.vicpin.cleanrecyclerview.sample.extensions.load
-import com.vicpin.cleanrecyclerview.sample.extensions.startActivityWithTransition
-import com.vicpin.cleanrecyclerview.sample.model.Item
+import com.vicpin.cleanrecycler.sample.extensions.load
+import com.vicpin.cleanrecycler.sample.extensions.startActivityWithTransition
+import com.vicpin.cleanrecycler.sample.R
+import com.vicpin.cleanrecycler.sample.model.Item
+
 import kotlinx.android.synthetic.main.activity_detail.*
 
 class DetailActivity : AppCompatActivity() {

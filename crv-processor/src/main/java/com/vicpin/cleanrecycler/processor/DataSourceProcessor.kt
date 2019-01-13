@@ -2,9 +2,9 @@ package com.vicpin.cleanrecycler.processor
 
 
 
-import com.vicpin.cleanrecyclerview.processor.model.Model
-import com.vicpin.cleanrecyclerview.processor.util.EnvironmentUtil
-import com.vicpin.cleanrecyclerview.processor.writter.CleanRecyclerWritter
+import com.vicpin.cleanrecycler.processor.model.Model
+import com.vicpin.cleanrecycler.processor.util.EnvironmentUtil
+import com.vicpin.cleanrecycler.processor.writter.CleanRecyclerWritter
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment

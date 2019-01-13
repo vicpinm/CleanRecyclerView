@@ -1,7 +1,8 @@
-package com.vicpin.cleanrecyclerview.sample.data
+package com.vicpin.cleanrecycler.sample.data
 
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource
-import com.vicpin.cleanrecyclerview.sample.model.Item
+import com.vicpin.cleanrecycler.repository.datasource.CloudDataSource
+import com.vicpin.cleanrecycler.sample.model.Item
+
 import io.reactivex.Single
 import java.io.IOException
 import java.util.concurrent.TimeUnit

@@ -1,6 +1,6 @@
-package com.vicpin.cleanrecyclerview.sample.view.presenter
+package com.vicpin.cleanrecycler.sample.view.presenter
 
-import com.vicpin.cleanrecyclerview.sample.model.Item
+import com.vicpin.cleanrecycler.sample.model.Item
 import com.vicpin.kpresenteradapter.ViewHolderPresenter
 
 /**

@@ -1,8 +1,8 @@
-package com.vicpin.cleanrecyclerview.repository
+package com.vicpin.cleanrecycler.repository
 
-import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.CloudParamPagedDataSource
-import com.vicpin.cleanrecyclerview.repository.datasource.ParamCacheDataSource
+import com.vicpin.cleanrecycler.repository.datasource.CRDataSource
+import com.vicpin.cleanrecycler.repository.datasource.CloudParamPagedDataSource
+import com.vicpin.cleanrecycler.repository.datasource.ParamCacheDataSource
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

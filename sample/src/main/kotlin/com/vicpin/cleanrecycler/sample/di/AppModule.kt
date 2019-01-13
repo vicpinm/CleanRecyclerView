@@ -1,9 +1,10 @@
-package com.vicpin.cleanrecyclerview.sample.di
+package com.vicpin.cleanrecycler.sample.di
 
 import android.app.Application
-import com.vicpin.cleanrecyclerview.sample.data.ItemCache
-import com.vicpin.cleanrecyclerview.sample.data.ItemPagedService
-import com.vicpin.cleanrecyclerview.sample.data.ItemService
+import com.vicpin.cleanrecycler.sample.data.ItemCache
+import com.vicpin.cleanrecycler.sample.data.ItemPagedService
+import com.vicpin.cleanrecycler.sample.data.ItemService
+
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

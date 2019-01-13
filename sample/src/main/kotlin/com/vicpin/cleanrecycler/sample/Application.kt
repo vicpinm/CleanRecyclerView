@@ -1,9 +1,10 @@
-package com.vicpin.cleanrecyclerview.sample
+package com.vicpin.cleanrecycler.sample
 
 import androidx.multidex.MultiDexApplication
-import com.vicpin.cleanrecyclerview.sample.di.AppComponent
-import com.vicpin.cleanrecyclerview.sample.di.AppModule
-import com.vicpin.cleanrecyclerview.sample.di.DaggerAppComponent
+import com.vicpin.cleanrecycler.sample.di.AppComponent
+import com.vicpin.cleanrecycler.sample.di.AppModule
+import com.vicpin.cleanrecycler.sample.di.DaggerAppComponent
+
 
 /**
  * Created by Oesia on 29/05/2017.

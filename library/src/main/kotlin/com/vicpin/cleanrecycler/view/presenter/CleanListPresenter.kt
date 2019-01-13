@@ -1,7 +1,7 @@
-package com.vicpin.cleanrecyclerview.view.presenter
+package com.vicpin.cleanrecycler.view.presenter
 
 import android.util.Log
-import com.vicpin.cleanrecyclerview.domain.GetDataCase
+import com.vicpin.cleanrecycler.domain.GetDataCase
 import com.vicpinm.autosubscription.Unsubscriber
 import com.vicpinm.autosubscription.anotations.AutoSubscription
 

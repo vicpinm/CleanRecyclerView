@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.repository.datasource
+package com.vicpin.cleanrecycler.repository.datasource
 
 import io.reactivex.Flowable
 

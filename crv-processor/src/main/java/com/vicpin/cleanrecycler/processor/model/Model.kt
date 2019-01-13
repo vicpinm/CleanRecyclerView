@@ -1,10 +1,10 @@
 package com.vicpin.cleanrecycler.processor.model
 
 
-import com.vicpin.cleanrecyclerview.annotation.DataSource
-import com.vicpin.cleanrecyclerview.annotation.Mapper
-import com.vicpin.cleanrecyclerview.annotation.processor.entity.MapperClass
-import com.vicpin.cleanrecyclerview.processor.util.EnvironmentUtil
+import com.vicpin.cleanrecycler.annotation.DataSource
+import com.vicpin.cleanrecycler.annotation.Mapper
+import com.vicpin.cleanrecycler.annotation.processor.entity.MapperClass
+import com.vicpin.cleanrecycler.processor.util.EnvironmentUtil
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind

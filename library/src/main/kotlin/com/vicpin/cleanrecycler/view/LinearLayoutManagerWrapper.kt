@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.view
+package com.vicpin.cleanrecycler.view
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager

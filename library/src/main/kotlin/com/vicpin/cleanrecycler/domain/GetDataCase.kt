@@ -1,10 +1,11 @@
-package com.vicpin.cleanrecyclerview.domain
+package com.vicpin.cleanrecycler.domain
 
-import com.vicpin.cleanrecyclerview.repository.ListRepository
-import com.vicpin.cleanrecyclerview.repository.datasource.CRDataSource
-import com.vicpin.cleanrecyclerview.view.interfaces.CollectionMapper
-import com.vicpin.cleanrecyclerview.view.interfaces.EntityMapper
-import com.vicpin.cleanrecyclerview.view.interfaces.Mapper
+import com.vicpin.cleanrecycler.repository.ListRepository
+import com.vicpin.cleanrecycler.repository.datasource.CRDataSource
+import com.vicpin.cleanrecycler.view.interfaces.CollectionMapper
+import com.vicpin.cleanrecycler.view.interfaces.EntityMapper
+
+import com.vicpin.cleanrecycler.view.interfaces.Mapper
 import io.reactivex.Flowable
 
 /**

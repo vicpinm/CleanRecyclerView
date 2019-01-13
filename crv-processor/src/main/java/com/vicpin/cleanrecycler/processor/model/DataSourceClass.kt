@@ -1,7 +1,7 @@
 package com.vicpin.cleanrecycler.processor.model
 
-import com.vicpin.cleanrecyclerview.processor.model.DataSourceClass.DataSourceParent.*
-import com.vicpin.cleanrecyclerview.processor.util.EnvironmentUtil
+import com.vicpin.cleanrecycler.processor.model.DataSourceClass.DataSourceParent.*
+import com.vicpin.cleanrecycler.processor.util.EnvironmentUtil
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType

@@ -1,7 +1,7 @@
-package com.vicpin.cleanrecyclerview.sample.model
+package com.vicpin.cleanrecycler.sample.model
 
 import com.vicpin.cleanrecyclerview.annotation.Mapper
-import com.vicpin.cleanrecyclerview.view.interfaces.EntityMapper
+import com.vicpin.cleanrecycler.view.interfaces.EntityMapper
 
 @Mapper
 class Mapper: EntityMapper<Item, Item> {

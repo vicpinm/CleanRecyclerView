@@ -1,9 +1,10 @@
-package com.vicpin.cleanrecyclerview.sample.view.adapter
+package com.vicpin.cleanrecycler.sample.view.adapter
 
 import android.view.View
-import com.vicpin.cleanrecyclerview.sample.extensions.load
-import com.vicpin.cleanrecyclerview.sample.model.Item
-import com.vicpin.cleanrecyclerview.sample.view.presenter.AdapterItemPresenter
+import com.vicpin.cleanrecycler.sample.extensions.load
+import com.vicpin.cleanrecycler.sample.model.Item
+import com.vicpin.cleanrecycler.sample.view.presenter.AdapterItemPresenter
+
 import com.vicpin.kpresenteradapter.ViewHolder
 import kotlinx.android.synthetic.main.adapter_item.view.*
 

@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.view.presenter
+package com.vicpin.cleanrecycler.view.presenter
 
 /**
  * Created by Victor on 20/01/2017.

@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.view
+package com.vicpin.cleanrecycler.view
 
 import android.content.Context
 import android.os.Handler
@@ -13,15 +13,16 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.vicpin.cleanrecyclerview.R
-import com.vicpin.cleanrecyclerview.domain.GetDataCase
-import com.vicpin.cleanrecyclerview.repository.ListRepository
-import com.vicpin.cleanrecyclerview.repository.datasource.*
-import com.vicpin.cleanrecyclerview.view.interfaces.Mapper
-import com.vicpin.cleanrecyclerview.view.presenter.CleanListPresenter
-import com.vicpin.cleanrecyclerview.view.presenter.ICleanRecyclerView
-import com.vicpin.cleanrecyclerview.view.util.DividerDecoration
-import com.vicpin.cleanrecyclerview.view.util.RecyclerViewMargin
+import androidx.annotation.DrawableRes
+import com.vicpin.cleanrecycler.R
+import com.vicpin.cleanrecycler.domain.GetDataCase
+import com.vicpin.cleanrecycler.repository.ListRepository
+import com.vicpin.cleanrecycler.repository.datasource.*
+import com.vicpin.cleanrecycler.view.interfaces.Mapper
+import com.vicpin.cleanrecycler.view.presenter.CleanListPresenter
+import com.vicpin.cleanrecycler.view.presenter.ICleanRecyclerView
+import com.vicpin.cleanrecycler.view.util.DividerDecoration
+import com.vicpin.cleanrecycler.view.util.RecyclerViewMargin
 import com.vicpin.kpresenteradapter.PresenterAdapter
 import com.vicpin.kpresenteradapter.SingleLinePresenterAdapter
 import com.vicpin.kpresenteradapter.ViewHolder
@@ -36,7 +37,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     //public fields
     var refresh: SwipeRefreshLayout? = null
     var recyclerView: RecyclerView? = null
-    var itemDecoration: RecyclerView.ItemDecoration? = null
+    var marginDecoration: RecyclerView.ItemDecoration? = null
+    var dividerDecoration: DividerDecoration? = null
 
     var layoutManager: RecyclerView.LayoutManager? = null
         set(layoutManager) {
@@ -65,7 +67,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var inited = false
     private var isAttached = false
     private var itemsPerPage = 0
-    private var cellMargin = 10
+    private var cellMargin = 0
     private var emptyLayout: Int = 0
     private var errorLayout: Int = 0
     private var errorToast: Int = 0
@@ -76,14 +78,18 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var showHeaderIfEmptyList = false
     private var wrapInNestedScroll = false
 
-    constructor(context: Context?) : super(context)
+    constructor(context: Context?) : super(context) {
+        inflate()
+    }
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         processAttrs(attrs)
+        inflate()
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         processAttrs(attrs)
+        inflate()
     }
 
     fun processAttrs(attrs: AttributeSet?) {
@@ -91,7 +97,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
         try {
             itemsPerPage = a?.getInt(R.styleable.CleanRecyclerView_itemsPerPage, 0) ?: 0
-            cellMargin = a?.getDimensionPixelSize(R.styleable.CleanRecyclerView_cellMargin, 10) ?: 10
+            cellMargin = a?.getDimensionPixelSize(R.styleable.CleanRecyclerView_cellMargin, 0) ?: 0
             emptyLayout = a?.getResourceId(R.styleable.CleanRecyclerView_emptyLayout, 0) ?: 0
             errorLayout = a?.getResourceId(R.styleable.CleanRecyclerView_errorLayout, 0) ?: 0
             errorToast = a?.getResourceId(R.styleable.CleanRecyclerView_errorToast, 0) ?: 0
@@ -112,8 +118,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         }
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
+    private fun inflate() {
         inflateView()
         isAttached = true
         init()
@@ -228,19 +233,33 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     private fun updateDecoration() {
-        itemDecoration?.let { recyclerView?.removeItemDecoration(it) }
-        if (layoutManager is GridLayoutManager) {
-            itemDecoration = RecyclerViewMargin(cellMargin, (layoutManager as GridLayoutManager).spanCount, (layoutManager as GridLayoutManager).orientation)
-        } else if (layoutManager is LinearLayoutManager) {
-            itemDecoration = RecyclerViewMargin(cellMargin, 1, (layoutManager as LinearLayoutManager).orientation)
+        marginDecoration?.let { recyclerView?.removeItemDecoration(it) }
+
+        if(cellMargin > 0) {
+            if (layoutManager is GridLayoutManager) {
+                marginDecoration = RecyclerViewMargin(cellMargin, (layoutManager as GridLayoutManager).spanCount, (layoutManager as GridLayoutManager).orientation)
+            } else if (layoutManager is LinearLayoutManager) {
+                marginDecoration = RecyclerViewMargin(cellMargin, 1, (layoutManager as LinearLayoutManager).orientation)
+            }
+            marginDecoration?.let { recyclerView?.addItemDecoration(it) }
         }
-        itemDecoration?.let { recyclerView?.addItemDecoration(it) }
+
+        addDividerDecoration()
+    }
+
+    private fun addDividerDecoration() {
+        dividerDecoration?.let { recyclerView?.removeItemDecoration(it) }
 
         if (dividerDrawable > 0 && layoutManager is LinearLayoutManager) {
-            val divider = DividerDecoration(context, (layoutManager as LinearLayoutManager).orientation)
-            ContextCompat.getDrawable(context, dividerDrawable)?.let { divider.setDrawable(it) }
-            recyclerView?.addItemDecoration(divider)
+            dividerDecoration = DividerDecoration(context, (layoutManager as LinearLayoutManager).orientation)
+            ContextCompat.getDrawable(context, dividerDrawable)?.let { dividerDecoration?.setDrawable(it) }
+            recyclerView?.addItemDecoration(dividerDecoration!!)
         }
+    }
+
+    fun setDividerDrawable(@DrawableRes resId: Int) {
+        this.dividerDrawable = resId
+        addDividerDecoration()
     }
 
     fun reloadData() {
