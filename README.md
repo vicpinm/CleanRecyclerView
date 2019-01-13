@@ -1,6 +1,7 @@
-# CleanRecyclerView
-
-RecyclerView wrapper with functionality related data loading from cache and cloud, pagination, pull to refresh and placeholders (error, empty and so on). It integrates KPresenterAdapter library for creating adapters.
+ <p align="center">
+  <img width="80%" src ="/cleanrecycler.png" />
+</p>
+**RecyclerView wrapper with functionality related data loading from cache and cloud, pagination, pull to refresh and placeholders (error, empty and so on). It integrates KPresenterAdapter library for creating adapters.**
 
 ### Download 
 
