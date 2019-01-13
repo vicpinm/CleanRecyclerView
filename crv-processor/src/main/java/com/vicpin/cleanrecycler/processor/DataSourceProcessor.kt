@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.processor
+package com.vicpin.cleanrecycler.processor
 
 
 

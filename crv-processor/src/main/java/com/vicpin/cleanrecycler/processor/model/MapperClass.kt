@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.annotation.processor.entity
+package com.vicpin.cleanrecycler.annotation.processor.entity
 
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement

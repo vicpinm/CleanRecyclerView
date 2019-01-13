@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.processor.util
+package com.vicpin.cleanrecycler.processor.util
 
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec

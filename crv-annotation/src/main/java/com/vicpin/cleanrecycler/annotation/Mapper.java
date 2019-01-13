@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.annotation;
+package com.vicpin.cleanrecycler.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
-public @interface DataSource {
+public @interface Mapper {
 
 }

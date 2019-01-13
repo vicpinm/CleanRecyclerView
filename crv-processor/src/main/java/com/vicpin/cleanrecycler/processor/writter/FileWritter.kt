@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.processor.writter
+package com.vicpin.cleanrecycler.processor.writter
 
 import java.io.File
 import java.io.IOException

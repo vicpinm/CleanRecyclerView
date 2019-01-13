@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview.processor.writter
+package com.vicpin.cleanrecycler.processor.writter
 
 import com.vicpin.cleanrecyclerview.annotation.processor.entity.MapperClass
 import com.vicpin.cleanrecyclerview.processor.model.CleanRecyclerClass

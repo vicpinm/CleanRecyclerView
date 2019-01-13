@@ -1,4 +1,4 @@
-package com.vicpin.cleanrecyclerview;
+package com.vicpin.cleanrecycler;
 
 import org.junit.Test;
 
