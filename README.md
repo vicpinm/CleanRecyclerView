@@ -33,11 +33,12 @@
 
 
 **3 - Provide the datasources you want to retreive your data from**
+
 You can use two datasource types:
 - Cached datasource (data storaged in device, no cloud request is needed)
 - Cloud datasource (data storaged in a remote server)
 
-You can implement any of them or both of them. 
+You can implement any or both of them. 
 ```kotlin
 //When cloud data is not paginated
 cleanRecycler.load(adapter = presenterAdapter, cloud = DataService::class, cache = DataCache::class)
@@ -55,6 +56,64 @@ This workflow is explained in details in the following diagram:
  <p align="center">
   <img src ="/diagram.png" />
 </p>
+
+## DataSources
+CleanRecycler library uses **rxjava2** to listen to changes in your database and perform api requests. You are not bound to any database library or network client, only implement the methods required by the datasource interface you inherit from. DataSources are parameterized with the type of entity model that datasource is responsible for. You should create separate datasources for each entity you want to manage. 
+
+This library is prepared to work with two datasource types: cache datasource and cloud datasource. You can also use only one of them if you don't need both. 
+
+Depending on your requieremens, there are different varieties of cache/cloud datasources:
+
+### Cloud datasources types
+ * ```CloudDataSource<Model>```: Simplest cloud datasource. You only have to implement one method: ```fun getData(): Single<List<Model>>```. It returns a single object with a list of objects retreived from your server. 
+ 
+  * ```CloudPagedDataSource<Model>```: Paginated cloud datasource. The method you have to implement is the same than before, but it receives a 'page' param, which indicates the current page you have to request to your server: ```fun getData(page: Int): Single<List<Model>>```. Every time user reaches the bottom of the list, this method will be invoked with an incremented value of the 'page' parameter. 
+  
+### Cache datasources types
+* ```CacheDataSource<Model>```: With cache datasources, two methods are required:
+````kotlin
+fun getData(): Flowable<List<Model>>
+
+fun saveData(clearOldData: Boolean, data: List<Model>)
+````
+
+When you need to observe changes in your database and update the view consequently, you should use this datasource. As can be seen, 'getData' method returns a Flowable with the result of the query you perform to your local storage. Most of the ORM libraries are able to return this type of data for listening to database changes. 
+
+On the other hand, 'saveData' method is invoked when a new set of data is retreived from your cloud. The first parameter, clearOldData, is set to true when the previous local data need to be cleaned. This is true always when you use ```CloudDataSource```. With ```CloudPagedDataSource```, it will be only true when first data page is requested. Remaining pages will be  appended to your existing data, without removing old local data. 
+
+## Data mapping between layers
+In a clean arquitecture based app, is common to separate your database entities and your view entities, mapping the first to the second in an intermediate class. 
+
+CleanRecyclerView class is parameterized with two generic types: 
+```kotlin
+class CleanRecyclerView<ViewEntity : Any, DataEntity : Any>
+```
+
+As you can see, first generic type corresponds to your view's entity type, and the second one corresponds to your database's entity type. You can set a mapper class between your two entities in your 'load' or 'loadPaged' method: 
+
+```kotlin
+val cleanRecycler = viewlist as CleanRecyclerView<ViewItem, DatabaseItem>
+cleanRecycler.load(adapter = presenterAdapter, cloud = DataService::class, cache = DataCache::class, mapper: Mapper:class)
+```
+
+Your mapper class will look like:
+
+```kotlin
+class Mapper: EntityMapper<ViewItem, DatabaseItem> {
+    override fun transform(dataEntity: DatabaseItem): ViewItem {
+    	val viewItem = ViewItem()
+	...
+        return viewItem
+    }
+}
+```
+
+If you work only with one entity type, you can use SimpleCleanRecyclerView instead:
+```kotlin
+val cleanRecycler = list as SimpleCleanRecyclerView<Item>
+cleanRecycler.load(adapter = presenterAdapter, cloud = DataService::class, cache = DataCache::class)
+```
+
 
 ## Download 
 
@@ -74,9 +133,5 @@ dependencies {
 	   compile 'com.github.vicpinm:CleanRecyclerView:4.0.1'
 }
   ```
-  
-  <p align="center">
-  <img src ="/diagram.png" />
-</p>
-
+ 
   
