@@ -51,7 +51,7 @@ Notice that you have to pass an instance of your adapter usign KPresenterAdapter
 ## How it works
 First, CleanRecyclerView loads cached data, if any. Then, it tries to update local data from your cloud datasource. When your cloud datasource retreives the data successfully, the library stores the updated data in your local storage, if a cached datasource is provided. Next, it updates the view with the new data. If an error is thrown while fetching data from your server, an error placeholder is shown to the user if there is no local data to be shown. If view already contains data fetched from your local storage, a toast is used to warn your user about the error (if a string resource is setted to ```errorToast``` attribute). If local storage does not contain any data and your cloud datasource returns no data either, an empty placeholder will be shown to the user. 
 
-This workflow is explained in details in the following diagram:
+This workflow is explained in detail in the following diagram:
 
  <p align="center">
   <img src ="/diagram.png" />
