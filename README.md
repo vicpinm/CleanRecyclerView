@@ -7,7 +7,7 @@
 ## Setup library
 **1 - Add the CleanRecyclerView widget to your xml**
 ```xml
- <com.vicpin.cleanrecyclerview.view.CleanRecyclerView
+ <com.vicpin.cleanrecycler.view.CleanRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
