@@ -35,9 +35,9 @@ constructor(
     private fun transformData(dataEntities: List<DataEntity>) : List<ViewEntity> {
         return if(mapper != null) {
             if(mapper is EntityMapper) {
-                dataEntities.map { mapper.transform(it) }
+                dataEntities.map { mapper.doTransform(it) }
             } else {
-                (mapper as CollectionMapper).transform(dataEntities)
+                (mapper as CollectionMapper).doTransform(dataEntities)
             }
         }
         else {

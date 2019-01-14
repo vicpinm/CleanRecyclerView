@@ -31,7 +31,7 @@ android {
 ext {
     support = "28.0.0"
     materialish = "1.7"
-    presenter_adapter = "3.0.0beta1"
+    presenter_adapter = "3.0.0beta2"
     autosubscription = '1.0.2'
 }
 

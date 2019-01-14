@@ -143,7 +143,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         empty = findViewById(R.id.empty)
         emptyError = findViewById(R.id.emptyError)
         recyclerView = findViewById(R.id.recyclerListView)
-        this.adapter?.notifyScrollStopped(recyclerView!!)
+        this.adapter?.notifyScrollStatus(recyclerView!!)
 
         if(wrapInNestedScroll) {
             recyclerView?.isNestedScrollingEnabled = false
