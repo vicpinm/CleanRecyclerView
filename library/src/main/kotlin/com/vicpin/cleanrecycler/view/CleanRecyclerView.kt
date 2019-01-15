@@ -143,7 +143,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         empty = findViewById(R.id.empty)
         emptyError = findViewById(R.id.emptyError)
         recyclerView = findViewById(R.id.recyclerListView)
-        this.adapter?.notifyScrollStopped(recyclerView!!)
+        this.adapter?.notifyScrollStatus(recyclerView!!)
 
         if(wrapInNestedScroll) {
             recyclerView?.isNestedScrollingEnabled = false
@@ -162,7 +162,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
         presenter = CleanListPresenter(cachedDataCase, cloudDataCase, cache !is SingleParamCacheDataSource, this, itemsPerPage, paged = true)
         this.adapter = adapter
-        this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
+        clickListener?.let {
+            this.adapter?.itemClickListener = { item, viewHolder -> it.invoke(item, viewHolder) }
+        }
         init()
     }
 
@@ -186,7 +188,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
         presenter = CleanListPresenter(cachedDataCase, cloudDataCase, cache !is SingleParamCacheDataSource, this, itemsPerPage, paged = false)
         this.adapter = adapter
-        this.adapter?.itemClickListener = { item, viewHolder -> clickListener?.invoke(item, viewHolder) }
+        clickListener?.let {
+            this.adapter?.itemClickListener = { item, viewHolder -> it.invoke(item, viewHolder) }
+        }
         init()
     }
 
