@@ -177,7 +177,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     /**
      * Load methods with no pagination
      */
-    @JvmOverloads fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: ParamCloudDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
+    @JvmOverloads fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudParamDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         inited = false
 
         val repository = ListRepository(cache, cloud, customData)
@@ -190,15 +190,15 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         init()
     }
 
-    @JvmOverloads fun <CustomData> loadSingleLine(@LayoutRes layoutResId: Int, cloud: ParamCloudDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
+    @JvmOverloads fun <CustomData> loadSingleLine(@LayoutRes layoutResId: Int, cloud: CloudParamDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         load(SingleLinePresenterAdapter(layoutResId), cloud, cache, mapper, customData)
     }
 
-    open fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out ParamCloudDataSource<DataEntity, CustomData>>? = null, cache: KClass<out ParamCacheDataSource<DataEntity, CustomData>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
+    open fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: KClass<out CloudParamDataSource<DataEntity, CustomData>>? = null, cache: KClass<out ParamCacheDataSource<DataEntity, CustomData>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         load(adapter, cloud?.java, cache?.java, mapper, customData)
     }
 
-    open fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out ParamCloudDataSource<DataEntity, CustomData>>? = null, cache: Class<out ParamCacheDataSource<DataEntity, CustomData>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
+    open fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: Class<out CloudParamDataSource<DataEntity, CustomData>>? = null, cache: Class<out ParamCacheDataSource<DataEntity, CustomData>>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         load(adapter, cloud?.newInstance(), cache?.newInstance(), mapper, customData)
     }
 

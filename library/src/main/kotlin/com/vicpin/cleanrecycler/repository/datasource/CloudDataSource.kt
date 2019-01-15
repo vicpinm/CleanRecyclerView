@@ -5,7 +5,7 @@ import io.reactivex.Single
 /**
  * Created by Victor on 20/01/2017.
  */
-interface CloudDataSource<T>: ParamCloudDataSource<T,T> {
+interface CloudDataSource<T>: CloudParamDataSource<T,T> {
 
     override fun getData(data: T?): Single<List<T>> = getData()
 
