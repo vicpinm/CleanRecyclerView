@@ -12,13 +12,18 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activity.MainActivity">
+        <activity android:name=".view.activity.MenuActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.activity.NoPagedListActivity"></activity>
+        <activity android:name=".view.activity.PagedListActivity"></activity>
+        <activity android:name=".view.activity.MappedListActivity"></activity>
+        <activity android:name=".view.activity.AnnotatedListActivity"></activity>
+
         <activity android:name=".view.activity.DetailActivity"></activity>
     </application>
 

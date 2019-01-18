@@ -15,7 +15,7 @@ import javax.lang.model.element.TypeElement
 /**
  * Created by victor on 10/12/17.
  */
-@SupportedAnnotationTypes("com.vicpin.cleanrecyclerview.annotation.DataSource","com.vicpin.cleanrecyclerview.annotation.Mapper")
+@SupportedAnnotationTypes("com.vicpin.cleanrecycler.annotation.DataSource","com.vicpin.cleanrecycler.annotation.Mapper")
 class DataSourceProcessor : AbstractProcessor() {
 
     val cleanRecyclerWritter = CleanRecyclerWritter()

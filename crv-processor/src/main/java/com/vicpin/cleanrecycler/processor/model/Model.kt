@@ -4,8 +4,8 @@ package com.vicpin.cleanrecycler.processor.model
 
 import com.vicpin.cleanrecycler.annotation.processor.entity.MapperClass
 import com.vicpin.cleanrecycler.processor.util.EnvironmentUtil
-import com.vicpin.cleanrecyclerview.annotation.DataSource
-import com.vicpin.cleanrecyclerview.annotation.Mapper
+import com.vicpin.cleanrecycler.annotation.DataSource
+import com.vicpin.cleanrecycler.annotation.Mapper
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
@@ -21,7 +21,6 @@ class Model private constructor() {
 
     private fun parseAnnotation(env: RoundEnvironment, annotationClass: Class<Annotation>) {
         val annotatedClasses = env.getElementsAnnotatedWith(annotationClass)
-
         for (annotatedClass in annotatedClasses) {
             parseAnnotatedClass(annotatedClass, annotationClass)
         }
@@ -62,9 +61,11 @@ class Model private constructor() {
 
         types.forEach { type ->
 
-
-            val dataSourcesForType = dataSourceClasses.filter { it.getDataEntityType() == type }
-            val mappersForType = mapperClasses.filter { it.getDataEntityType() == type }
+            val dataSourcesForType = dataSourceClasses.filter {
+                it.getDataEntityType() == type
+            }
+            val mappersForType = mapperClasses.filter {
+                it.getDataEntityType() == type }
 
             if(dataSourcesForType.size > 2) {
                 EnvironmentUtil.logError("Too many datasource classes found (${dataSourcesForType.size} for type $type")
@@ -84,11 +85,9 @@ class Model private constructor() {
             if(cleanRecyclerClass.cacheDataSource != null && cleanRecyclerClass.cloudDataSource != null) {
                 val customDataInCache = cleanRecyclerClass.cacheDataSource.hasCustomData()
                 val customDataInCloud = cleanRecyclerClass.cloudDataSource.hasCustomData()
-
                 if(customDataInCache != customDataInCloud) {
                     EnvironmentUtil.logError("If you use custom data in your datasource for a given type, the other datasource must receive custom data too. Cache data source class: ${cleanRecyclerClass.cacheDataSource.classReference}, cloud data source class: ${cleanRecyclerClass.cloudDataSource.classReference} ")
                 } else if(customDataInCache && customDataInCloud) {
-
                     if(cleanRecyclerClass.cacheDataSource.types[1] != cleanRecyclerClass.cloudDataSource.types[1]) {
                         EnvironmentUtil.logError("Your datasources does not share the same custom data type. Cache data source class: ${cleanRecyclerClass.cacheDataSource.classReference}, cloud data source class: ${cleanRecyclerClass.cloudDataSource.classReference} ")
                     }

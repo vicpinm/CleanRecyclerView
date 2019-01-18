@@ -2,6 +2,7 @@ package com.vicpin.cleanrecycler.processor.writter
 
 import com.vicpin.cleanrecycler.annotation.processor.entity.MapperClass
 import com.vicpin.cleanrecycler.processor.model.CleanRecyclerClass
+import com.vicpin.cleanrecycler.processor.util.EnvironmentUtil
 import javax.annotation.processing.ProcessingEnvironment
 
 

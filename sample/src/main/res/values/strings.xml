@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">CleanRecyclerView</string>
     <string name="transition_item">transition_item</string>
+    <string name="menu_1">No paged list</string>
+    <string name="menu_2">Paged list</string>
+    <string name="menu_3">Mapped list</string>
+    <string name="menu_4">Datasources annotated list</string>
+
 </resources>

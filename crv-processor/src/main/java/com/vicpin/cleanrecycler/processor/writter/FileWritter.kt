@@ -11,7 +11,7 @@ class FileWritter {
 
     companion object {
         private val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
-        val PACKAGE: String = "com.vicpin.cleanrecyclerview"
+        val PACKAGE: String = "com.vicpin.cleanrecycler"
     }
 
     var text = ""

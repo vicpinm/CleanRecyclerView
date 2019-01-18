@@ -8,6 +8,7 @@ import com.vicpin.cleanrecycler.processor.util.EnvironmentUtil
  */
 class CleanRecyclerClass(val typeName: String, val cacheDataSource: DataSourceClass? = null, val cloudDataSource: DataSourceClass? = null, val mapper: MapperClass? = null) {
 
+
     fun getDataEntityTypeName() = when {
             cacheDataSource != null -> cacheDataSource.getDataEntityType()
             cloudDataSource != null -> cloudDataSource.getDataEntityType()

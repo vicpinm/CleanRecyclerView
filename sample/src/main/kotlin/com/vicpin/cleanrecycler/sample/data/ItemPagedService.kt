@@ -1,35 +1,21 @@
 package com.vicpin.cleanrecycler.sample.data
 
-import android.util.Log
 import com.vicpin.cleanrecycler.repository.datasource.CloudPagedDataSource
 import com.vicpin.cleanrecycler.sample.model.Item
-import com.vicpin.cleanrecyclerview.annotation.DataSource
 import io.reactivex.Single
-import io.reactivex.SingleSource
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
  * Created by victor on 21/1/17.
  */
-@DataSource
 open class ItemPagedService : CloudPagedDataSource<Item> {
 
     val PAGE_LIMIT = 5
     var description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
     var first = false
+
     override fun getData(page: Int): Single<List<Item>> {
-        return Single.just(getFakeItems(page)).delay(2, TimeUnit.SECONDS).flatMap(object: io.reactivex.functions.Function<List<Item>, SingleSource<out List<Item>>> {
-            override fun apply(t: List<Item>): SingleSource<out List<Item>> {
-                if(!first) {
-                    first = true
-                    return Single.just(t)
-
-                }
-                return Single.error(IOException(""))
-            }
-
-        })
+        return Single.just(getFakeItems(page)).delay(2, TimeUnit.SECONDS)
     }
 
 
@@ -56,7 +42,6 @@ open class ItemPagedService : CloudPagedDataSource<Item> {
             list.add(item5)
         }
 
-Log.e("aa","service solicitada pag $startFrom devolviendo ${list.size}")
         return list
     }
 

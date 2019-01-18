@@ -35,7 +35,7 @@ import org.mockito.Spy
  * Created by Victor on 19/05/2017.
  */
 @RunWith(AndroidJUnit4::class)
-class MainActivityTest {
+class NoPagedListActivityTest {
 
     val ITEMS_PER_PAGE = 5
 

@@ -179,7 +179,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     /**
      * Load methods with no pagination
      */
-    @JvmOverloads fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudParamDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
+    @JvmOverloads open fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudParamDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         inited = false
 
         val repository = ListRepository(cache, cloud, customData)
@@ -340,6 +340,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     fun onItemClick(listener: ((ViewEntity, ViewHolder<ViewEntity>) -> Unit)) {
         this.clickListener = listener
+        adapter?.let {
+            it.itemClickListener = { item, view -> listener(item, view) }
+        }
     }
 
     override fun onDetachedFromWindow() {

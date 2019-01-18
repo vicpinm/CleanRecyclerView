@@ -12,12 +12,14 @@ import javax.lang.model.type.DeclaredType
 class DataSourceClass(val annotatedField: Element) {
 
     enum class DataSourceParent(val className: String) {
-        CLOUD_DATASOURCE_CLASS("com.vicpin.cleanrecyclerview.repository.datasource.CloudDataSource"),
-        SIMPLE_CLOUD_DATASOURCE_CLASS("com.vicpin.cleanrecyclerview.repository.datasource.SimpleCloudDataSource"),
-        PAGED_CLOUD_DATASOURCE_CLASS("com.vicpin.cleanrecyclerview.repository.datasource.CloudPagedDataSource"),
-        SIMPLE_DATA_CLOUD_DATASOURCE_CLASS("com.vicpin.cleanrecyclerview.repository.datasource.SimpleCloudPagedDataSource"),
-        CACHE_DATASOURCE_CLASS("com.vicpin.cleanrecyclerview.repository.datasource.CacheDataSource"),
-        SIMPLE_CACHE_DATASOURCE_CLASS("com.vicpin.cleanrecyclerview.repository.datasource.SimpleCacheDataSource");
+        CLOUD_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.CloudDataSource"),
+        PAGED_CLOUD_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.CloudPagedDataSource"),
+        CACHE_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.CacheDataSource"),
+        CLOUD_PARAM_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.CloudParamDataSource"),
+        CLOUD_PARAM_PAGED_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.CloudParamPagedDataSource"),
+        PARAM_CACHE_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.ParamCacheDataSource"),
+        SINGLE_CACHE_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.SingleCacheDataSource"),
+        SINGLE_PARAM_CACHE_DATASOURCE_CLASS("com.vicpin.cleanrecycler.repository.datasource.SingleParamCacheDataSource");
 
         companion object {
             fun fromClassName(className: String) = DataSourceParent.values().first { it.className == className }
@@ -52,13 +54,13 @@ class DataSourceClass(val annotatedField: Element) {
 
     fun getDataEntityType() = types.first()
 
-    fun isCacheDataSource() = parentClass == CACHE_DATASOURCE_CLASS || parentClass == SIMPLE_CACHE_DATASOURCE_CLASS
+    fun isCacheDataSource() = parentClass == CACHE_DATASOURCE_CLASS || parentClass == PARAM_CACHE_DATASOURCE_CLASS || parentClass == SINGLE_CACHE_DATASOURCE_CLASS || parentClass == SINGLE_PARAM_CACHE_DATASOURCE_CLASS
 
     fun isCloudDataSource() = !isCacheDataSource()
 
-    fun isPagedCloud() = parentClass == PAGED_CLOUD_DATASOURCE_CLASS || parentClass == SIMPLE_DATA_CLOUD_DATASOURCE_CLASS
+    fun isPagedCloud() = parentClass == PAGED_CLOUD_DATASOURCE_CLASS || parentClass == CLOUD_PARAM_PAGED_DATASOURCE_CLASS
 
-    fun hasCustomData() = listOf(PAGED_CLOUD_DATASOURCE_CLASS, CLOUD_DATASOURCE_CLASS, CACHE_DATASOURCE_CLASS).contains(parentClass)
+    fun hasCustomData() = listOf(CLOUD_PARAM_DATASOURCE_CLASS, CLOUD_PARAM_PAGED_DATASOURCE_CLASS, PARAM_CACHE_DATASOURCE_CLASS, SINGLE_PARAM_CACHE_DATASOURCE_CLASS).contains(parentClass)
 
 }
 

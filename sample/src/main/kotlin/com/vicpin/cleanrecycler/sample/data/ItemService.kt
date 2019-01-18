@@ -16,8 +16,7 @@ open class ItemService : CloudDataSource<Item> {
 
 
     override fun getData(): Single<List<Item>> {
-        return Single.just(getFakeItems()).delay(4, TimeUnit.SECONDS).flatMap { _ -> Single.error<List<Item>>(IOException("")) }
-       // return Observable.error(IOException())
+        return Single.just(getFakeItems()).delay(2, TimeUnit.SECONDS)
     }
 
     fun getFakeItems(): List<Item> {
@@ -30,7 +29,10 @@ open class ItemService : CloudDataSource<Item> {
         val item5 = Item("Material card 5", description, "https://lh3.googleusercontent.com/-SqJb4HuQr5k/V0pvoU_a1nI/AAAAAAAA6-0/0MbAFl2sxigt3PtYYGhE6VJeC_7KHsbfA/w960-h540/%2540OsumWalls%2BMaterial%2B%2BWallpapers%2B%25281%2529.jpg")
 
         list.add(item1)
-
+        list.add(item2)
+        list.add(item3)
+        list.add(item4)
+        list.add(item5)
 
         return list
     }
