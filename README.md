@@ -114,6 +114,30 @@ val cleanRecycler = list as SimpleCleanRecyclerView<Item>
 cleanRecycler.load(adapter = presenterAdapter, cloud = DataService::class, cache = DataCache::class)
 ```
 
+## Annotation Processor
+This library includes a small annotation processor which helps you write even less code. One problem I have identified with generics in view classes is that you can't set your generic type in your xml, so you have to do a casting in your activity like:
+
+```kotlin
+val cleanRecycler = viewlist as CleanRecyclerView<ViewItem, DatabaseItem>
+cleanRecycler.load(adapter = presenterAdapter, cloud = DataService::class, cache = DataCache::class, mapper: Mapper:class)
+```
+The annotation processor included is really simple and it can help you reduce the code above. It works with two annotations: @DataSource and @Mapper. In the previous example, we have two datasources: DataService and DataCache. Also, we use a mapper class to transform DatabaseItem model to ViewItem model. If we annotate both datasources classes with @DataSource and our mapper class with @Mapper, and press build project, the annotation processor will generate for you a custom view called ```DatabaseItemCleanRecyclerView```, which automatically uses with your datasources and your mapper class, so you only have to specify your adapter class. 
+
+In your xml file, instead of declaring a view of type CleanRecyclerView, you can reference to your brand new view automatically generated for you:
+
+```xml
+<com.vicpin.cleanrecycler.DatabaseItemCleanRecyclerView
+	android:id="@+id/cleanRecycler"
+	...			
+```
+
+And in your activity class, you won't need to perform any casting, you only have to set your adapter to your view:
+
+```kotlin
+cleanRecycler.load(adapter = presenterAdapter)
+```
+
+Thas is all! You can see a real example of annotation processor usage in the sample project. 
 
 ## Download 
 
