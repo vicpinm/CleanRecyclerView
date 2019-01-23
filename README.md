@@ -154,7 +154,9 @@ allprojects {
   And add the dependency
   ```groovy
 dependencies {
-	   compile 'com.github.vicpinm:CleanRecyclerView:4.0.1'
+	implementation 'com.github.vicpinm:CleanRecyclerView:5.0.2'
+	//Optional annotation proccesor
+	kapt 'com.github.vicpinm:crv-processor:5.0.1'
 }
   ```
  
