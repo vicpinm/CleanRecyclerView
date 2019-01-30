@@ -5,9 +5,9 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vicpin.cleanrecyclerview.sample.view.activity.MainActivity">
+    tools:context="com.vicpin.cleanrecycler.sample.view.activity.NoPagedListActivity">
 
-    <com.vicpin.cleanrecyclerview.view.CleanRecyclerView
+    <com.vicpin.cleanrecycler.view.SimpleCleanRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
