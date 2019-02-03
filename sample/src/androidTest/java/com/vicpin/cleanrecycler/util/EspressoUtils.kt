@@ -175,15 +175,6 @@ object EspressoUtils {
         }
     }
 
-    fun doAssertionOverRecyclerView(@IdRes recyclerId: Int = R.id.recyclerListView, count: Int = 0, assertion: ViewAssertion, viewId: Int) {
-
-        for (i in 0 until count) {
-            onView(withId(recyclerId)).perform(
-                    RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(i))
-            onView(withRecyclerView(recyclerId).atPositionOnView(i, viewId)).check(assertion)
-
-        }
-    }
 
     fun doActionOnRecyclerViewItem(@IdRes recyclerId: Int = R.id.recyclerListView, position: Int = 0, action: ViewAction, viewId: Int) {
         onView(withId(recyclerId)).perform(actionOnItemViewAtPosition(position, viewId, action))
