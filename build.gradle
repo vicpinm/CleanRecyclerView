@@ -12,7 +12,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0-rc01'
+        classpath 'com.android.tools.build:gradle:3.3.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
@@ -34,4 +34,36 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    buildToolsVersion = "28.0.3"
+    androidxLibVersion = "1.0.0"
+    coreVersion = "1.1.0"
+    extJUnitVersion = "1.1.0"
+    runnerVersion = "1.1.1"
+    rulesVersion = "1.1.1"
+    espressoVersion = "3.1.1"
+    materialVersion = "1.0.0"
+    appCompat = "1.0.2"
+    cardView = "1.0.0"
+    constraint = "2.0.0-alpha3"
+
+    support = "28.0.0"
+    picasso = "2.5.2"
+    constraint = "1.1.3"
+    espresso = "2.2.2"
+    mockwebserver = '3.4.1'
+    mockito = "2.8.9"
+    mockito_kotlin = "1.4.0"
+    testinjector = '1.0.0'
+    dagger = "2.18"
+    cappucino = "0.9.1"
+    multiDex = "2.0.1"
+    crvAnnotations = "5.0.1"
+    crvProcessor = "5.0.1"
+    rxJava = "2.1.16"
+    rxAndroid = "2.0.2"
+    kpresenter = "3.0.1"
+    daggerMock = "0.8.4"
 }

@@ -13,6 +13,7 @@ class MenuActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_menu)
 
+
         noPagedList.setOnClickListener { startActivity(Intent(this, NoPagedListActivity::class.java)) }
         pagedList.setOnClickListener { startActivity(Intent(this, PagedListActivity::class.java)) }
         mappedList.setOnClickListener { startActivity(Intent(this, MappedListActivity::class.java)) }

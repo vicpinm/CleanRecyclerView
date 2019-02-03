@@ -160,7 +160,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD) else null
         val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK) else null
 
-        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, cache !is SingleParamCacheDataSource, this, itemsPerPage, paged = true)
+        val observableCache = cache != null && cache !is SingleParamCacheDataSource
+
+        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, observableCache, this, itemsPerPage, paged = true)
         this.adapter = adapter
         clickListener?.let {
             this.adapter?.itemClickListener = { item, viewHolder -> it.invoke(item, viewHolder) }
@@ -186,7 +188,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD) else null
         val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK) else null
 
-        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, cache !is SingleParamCacheDataSource, this, itemsPerPage, paged = false)
+        val observableCache = cache != null && cache !is SingleParamCacheDataSource
+
+        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, observableCache, this, itemsPerPage, paged = false)
         this.adapter = adapter
         clickListener?.let {
             this.adapter?.itemClickListener = { item, viewHolder -> it.invoke(item, viewHolder) }

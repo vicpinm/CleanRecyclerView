@@ -1,9 +1,11 @@
-package com.vicpin.cleanrecyclerview.util;
+package com.vicpin.cleanrecycler.util;
 
 import android.content.res.Resources;
-import android.support.test.espresso.PerformException;
-import android.support.test.espresso.util.HumanReadables;
+
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.PerformException;
+import androidx.test.espresso.util.HumanReadables;
+
 import android.view.View;
 
 import org.hamcrest.Description;

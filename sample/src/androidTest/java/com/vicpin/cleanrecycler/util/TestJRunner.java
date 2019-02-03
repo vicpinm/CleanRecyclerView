@@ -1,7 +1,8 @@
 package com.vicpin.cleanrecyclerview.util;
 
 import android.os.Bundle;
-import android.support.test.runner.AndroidJUnitRunner;
+
+import androidx.test.runner.AndroidJUnitRunner;
 
 /**
  * Created by Oesia on 29/05/2017.

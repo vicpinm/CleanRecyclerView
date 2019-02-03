@@ -25,7 +25,7 @@ open class ItemCache: CacheDataSource<Item> {
 
     }, BackpressureStrategy.DROP)
 
-    private fun clearData() {
+    fun clearData() {
         memoryCache.clear()
     }
 
