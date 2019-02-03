@@ -48,7 +48,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     enum class Event {
         VIEW_LOADED,
-        DATA_LOADED,
+        DATA_LOADED, //Data loaded from any source event
+        DATA_LOADED_FROM_CLOUD,
+        DATA_LOADED_FROM_CACHE,
         EMPTY_LAYOUT_SHOWED,
         EMPTY_LAYOUT_HIDED,
         ERROR_LAYOUT_SHOWED,
@@ -293,10 +295,11 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         adapter?.addData(data)
     }
 
-    override fun setData(data: List<ViewEntity>) {
+    override fun setData(data: List<ViewEntity>, fromCloud: Boolean) {
         adapter?.setData(data)
         if (data.isNotEmpty()) {
             eventListener?.invoke(Event.DATA_LOADED)
+            eventListener?.invoke(if(fromCloud) Event.DATA_LOADED_FROM_CLOUD else Event.DATA_LOADED_FROM_CACHE)
         }
     }
 

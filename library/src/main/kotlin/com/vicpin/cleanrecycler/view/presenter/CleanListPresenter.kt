@@ -60,19 +60,20 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     }
 
 
-    private fun fetchCloudData(dataCase: GetDataCase<ViewEntity, DataEntity>) {
+    private fun fetchCloudData(dataCase: GetDataCase<ViewEntity, DataEntity>, nextPageLoad: Boolean = false) {
         showProgressPlaceholderIfNeeded()
 
-        if(itemsLoadedSize > 0) {
+        if(itemsLoadedSize > 0 && !nextPageLoad) {
             view.showRefreshing()
         }
+        
         dataCase.with(page = currentPage).execute(
                 onNext = { onCloudDataReceived(it)  },
                 onError = { onCloudErrorReceived() })
     }
 
     private fun onCachedDataReceived(result: List<ViewEntity>) {
-        view.setData(result)
+        view.setData(result, fromCloud = false)
         view.enableRefreshing()
 
         itemsLoadedSize = result.size
@@ -97,7 +98,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
         if(!observableDbMode) {
             //In observableDbMode, data is updated throw db notificaions, so ignore cloud notifications
             if(currentPage == 0) {
-                view.setData(result)
+                view.setData(result, fromCloud = true)
                 itemsLoadedSize = result.size
             } else {
                 view.addData(result)
@@ -175,6 +176,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     }
 
     fun refreshData() {
+        view.showRefreshing()
+
         if(getCloudDataCase != null) {
             currentPage = 0
             view.hideLoadMore()
@@ -188,7 +191,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     fun loadNextPage() {
         currentPage++
         if(getCloudDataCase != null) {
-            fetchCloudData(getCloudDataCase)
+            fetchCloudData(getCloudDataCase, nextPageLoad = true)
         }
     }
 

@@ -107,6 +107,7 @@ dependencies {
 
     //kotlin helper methods
     androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
+    androidTestImplementation 'com.google.truth:truth:0.42'
 
     // Note that espresso-idling-resource is used in the code under test.
     implementation 'androidx.test.espresso:espresso-idling-resource:' + rootProject.espressoVersion

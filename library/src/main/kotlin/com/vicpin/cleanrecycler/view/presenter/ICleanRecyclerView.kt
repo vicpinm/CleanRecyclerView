@@ -14,7 +14,7 @@ interface ICleanRecyclerView<T> {
 
     fun showLoadMore()
 
-    fun setData(data: List<T>)
+    fun setData(data: List<T>, fromCloud: Boolean)
 
     fun showRefreshing()
 
