@@ -1,9 +1,6 @@
 package com.vicpin.cleanrecycler.view.presenter
 
-import android.util.Log
 import com.vicpin.cleanrecycler.domain.GetDataCase
-import com.vicpinm.autosubscription.Unsubscriber
-import com.vicpinm.autosubscription.anotations.AutoSubscription
 
 
 /**
@@ -11,9 +8,9 @@ import com.vicpinm.autosubscription.anotations.AutoSubscription
  */
 class CleanListPresenter<ViewEntity, DataEntity> (
 
-        @AutoSubscription val getCachedDataCase: GetDataCase<ViewEntity, DataEntity>?,
+        val getCachedDataCase: GetDataCase<ViewEntity, DataEntity>?,
 
-        @AutoSubscription val getCloudDataCase: GetDataCase<ViewEntity, DataEntity>?,
+        val getCloudDataCase: GetDataCase<ViewEntity, DataEntity>?,
 
         val observableDbMode: Boolean = false,
 
@@ -30,7 +27,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     private var cloudDataSourceInvoked = false
 
     fun destroyView(){
-        Unsubscriber.unlink(this)
+        getCachedDataCase?.unsubscribe()
+        getCloudDataCase?.unsubscribe()
     }
 
     fun init(){
