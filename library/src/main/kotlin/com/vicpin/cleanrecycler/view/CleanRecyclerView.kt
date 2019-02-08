@@ -2,18 +2,18 @@ package com.vicpin.cleanrecycler.view
 
 import android.content.Context
 import android.os.Handler
-import androidx.annotation.LayoutRes
-import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.DrawableRes
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.vicpin.cleanrecycler.R
 import com.vicpin.cleanrecycler.domain.GetDataCase
 import com.vicpin.cleanrecycler.repository.ListRepository
@@ -164,7 +164,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
         val observableCache = cache != null && cache !is SingleParamCacheDataSource
 
-        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, observableCache, this, itemsPerPage, paged = true)
+        presenter = CleanListPresenter(cachedDataCase, cloudDataCase, observableCache, this, itemsPerPage, paged = cloudDataCase != null)
         this.adapter = adapter
         clickListener?.let {
             this.adapter?.itemClickListener = { item, viewHolder -> it.invoke(item, viewHolder) }
