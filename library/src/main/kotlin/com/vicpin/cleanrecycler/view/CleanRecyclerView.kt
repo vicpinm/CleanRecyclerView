@@ -385,7 +385,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         this.showHeaderIfEmptyList = showHeader
     }
 
-    fun loadEmptyLayout() {
+    private fun loadEmptyLayout() {
         if (emptyLayout > 0) {
             if(empty?.childCount ?: 0 > 0) {
                 empty?.removeAllViews()
@@ -394,12 +394,14 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
                 val view = View.inflate(context, emptyLayout, null)
                 empty?.addView(view)
             }
-
         }
     }
 
-    fun loadErrorLayout() {
+    private fun loadErrorLayout() {
         if (errorLayout > 0) {
+            if(emptyError?.childCount ?: 0 > 0) {
+                emptyError?.removeAllViews()
+            }
             if (emptyError?.childCount == 0) {
                 val view = View.inflate(context, errorLayout, null)
                 emptyError?.addView(view)
