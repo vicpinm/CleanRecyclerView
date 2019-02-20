@@ -42,8 +42,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     var layoutManager: RecyclerView.LayoutManager? = null
         set(layoutManager) {
+            val refreshAfterChange = field != null
             field = layoutManager
-            refresh()
+            if(refreshAfterChange) refresh()
         }
 
     enum class Event {
@@ -123,7 +124,6 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private fun inflate() {
         inflateView()
         isAttached = true
-        init()
         loadEmptyLayout()
         loadErrorLayout()
 
@@ -304,13 +304,13 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun showLoadMore() {
-        Handler().postDelayed({ adapter?.enableLoadMore { presenter?.loadNextPage() } }, 150)
+        Handler().postDelayed({ adapter?.enableLoadMore { presenter?.loadNextPage() } }, 200)
     }
 
     override fun hideLoadMore() {
         if(adapter?.loadMoreListener != null) {
             adapter?.loadMoreListener = null
-            Handler().postDelayed({ adapter?.disableLoadMore() }, 100)
+            Handler().postDelayed({ adapter?.disableLoadMore() }, 200)
         }
     }
 

@@ -109,7 +109,6 @@ class CleanListPresenter<ViewEntity, DataEntity> (
         view.hideProgress()
         view.hideRefreshing()
         view.hideErrorLayout()
-        view.hideLoadMore()
         view.enableRefreshing()
 
         if(itemsLoadedSize == 0 && result.isEmpty()) {

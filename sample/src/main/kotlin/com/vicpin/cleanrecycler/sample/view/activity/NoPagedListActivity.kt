@@ -2,23 +2,17 @@ package com.vicpin.cleanrecycler.sample.view.activity
 
 import android.content.Context
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.view.Menu
-import android.view.MenuItem
 import com.vicpin.cleanrecycler.sample.Application
-import com.vicpin.cleanrecycler.sample.data.ItemCache
+import com.vicpin.cleanrecycler.sample.R
 import com.vicpin.cleanrecycler.sample.extensions.injector
+import com.vicpin.cleanrecycler.sample.model.Item
 import com.vicpin.cleanrecycler.sample.view.adapter.AdapterItemView
 import com.vicpin.cleanrecycler.view.SimpleCleanRecyclerView
-import com.vicpin.cleanrecycler.sample.R
-import com.vicpin.cleanrecycler.sample.data.ItemService
-import com.vicpin.cleanrecycler.sample.extensions.finishIdlingResource
-import com.vicpin.cleanrecycler.sample.extensions.startIdlingResource
-import com.vicpin.cleanrecycler.sample.model.Item
-import com.vicpin.cleanrecycler.view.CleanRecyclerView
-
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
