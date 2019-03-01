@@ -62,8 +62,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     //private fields
     private var progress: ProgressBar? = null
-    private var empty: FrameLayout? = null
-    private var emptyError: FrameLayout? = null
+    var empty: FrameLayout? = null
+    var emptyError: FrameLayout? = null
     private var adapter: PresenterAdapter<ViewEntity>? = null
     private var presenter: CleanListPresenter<ViewEntity, DataEntity>? = null
     private var clickListener: ((ViewEntity, ViewHolder<ViewEntity>) -> Unit)? = null

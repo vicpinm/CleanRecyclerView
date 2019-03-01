@@ -39,7 +39,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
     private fun fetchData() {
         getCachedDataCase?.let { fetchCachedData(it, fetchCloudDataAfter = true) }
-        ?: getCloudDataCase?.let { fetchCloudData(it) }
+                ?: getCloudDataCase?.let { fetchCloudData(it) }
     }
 
     private fun fetchCachedData(dataCase: GetDataCase<ViewEntity, DataEntity>, fetchCloudDataAfter: Boolean) {
@@ -64,7 +64,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
         if(itemsLoadedSize > 0 && !nextPageLoad) {
             view.showRefreshing()
         }
-        
+
         dataCase.with(page = currentPage).execute(
                 onNext = { onCloudDataReceived(it)  },
                 onError = { onCloudErrorReceived() })
@@ -93,8 +93,12 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
     private fun onCloudDataReceived(result: List<ViewEntity>) {
         getCloudDataCase?.unsubscribe()
-        if(!observableDbMode) {
-            //In observableDbMode, data is updated throw db notificaions, so ignore cloud notifications
+
+        if(result.isEmpty()) {
+            view.hideLoadMore()
+        } else if(!observableDbMode) {
+            //In observableDbMode, view is updated throw db notificaions,
+            // so we only pass data to view here if we do not observe bbdd
             if(currentPage == 0) {
                 view.setData(result, fromCloud = true)
                 itemsLoadedSize = result.size
