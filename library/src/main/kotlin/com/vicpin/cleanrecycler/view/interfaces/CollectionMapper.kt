@@ -5,15 +5,11 @@ package com.vicpin.cleanrecycler.view.interfaces
  */
 abstract class CollectionMapper<ViewEntity, in DataEntity>: Mapper<ViewEntity, DataEntity> {
 
-    private var currentData: List<ViewEntity>? = null
+    override var currentData = listOf<ViewEntity>()
 
     fun doTransform(newData: List<DataEntity>) : List<ViewEntity> {
-        val result = transform(newData)
-        currentData = result
-        return result
+        return transform(newData)
     }
-
-    fun getCurrentData() = currentData
 
     abstract fun transform(newData: List<DataEntity>) : List<ViewEntity>
 }

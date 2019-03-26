@@ -158,11 +158,12 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     @JvmOverloads fun <CustomData> loadPaged(adapter: PresenterAdapter<ViewEntity>, cloud: CloudParamPagedDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         inited = false
 
-        val repository = ListRepository(cache, cloud, customData)
-        val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD) else null
-        val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK) else null
-
         val observableCache = cache != null && cache !is SingleParamCacheDataSource
+
+        val repository = ListRepository(cache, cloud, customData)
+        val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD, observableCache) else null
+        val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK, observableCache) else null
+
 
         presenter = CleanListPresenter(cachedDataCase, cloudDataCase, observableCache, this, itemsPerPage, paged = cloudDataCase != null)
         this.adapter = adapter
@@ -186,11 +187,12 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     @JvmOverloads open fun <CustomData> load(adapter: PresenterAdapter<ViewEntity>, cloud: CloudParamDataSource<DataEntity, CustomData>? = null, cache: ParamCacheDataSource<DataEntity, CustomData>? = null, mapper : Mapper<ViewEntity, DataEntity>? = null, customData: CustomData? = null) {
         inited = false
 
-        val repository = ListRepository(cache, cloud, customData)
-        val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD) else null
-        val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK) else null
-
         val observableCache = cache != null && cache !is SingleParamCacheDataSource
+
+        val repository = ListRepository(cache, cloud, customData)
+        val cloudDataCase = if(cloud != null) GetDataCase(repository, mapper, CRDataSource.CLOUD, observableCache) else null
+        val cachedDataCase = if(cache != null) GetDataCase(repository, mapper, CRDataSource.DISK, observableCache) else null
+
 
         presenter = CleanListPresenter(cachedDataCase, cloudDataCase, observableCache, this, itemsPerPage, paged = false)
         this.adapter = adapter
@@ -230,7 +232,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     private fun setupRecyclerView() {
         if (this.layoutManager == null) {
-            this.layoutManager = LinearLayoutManager(context)
+            this.layoutManager = LinearLayoutManagerWrapper(context)
         }
         recyclerView?.layoutManager = layoutManager
         recyclerView?.adapter = adapter

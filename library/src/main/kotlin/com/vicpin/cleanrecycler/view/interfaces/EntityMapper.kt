@@ -3,25 +3,19 @@ package com.vicpin.cleanrecycler.view.interfaces
 /**
  * Created by Oesia on 22/01/2018.
  */
-abstract class EntityMapper<out ViewEntity, in DataEntity>: Mapper<ViewEntity, DataEntity> {
+abstract class EntityMapper<ViewEntity, in DataEntity>: Mapper<ViewEntity, DataEntity> {
 
-    private var collection = mutableListOf<ViewEntity>()
+    override var currentData = listOf<ViewEntity>()
+
     private var currentPosition = 0
 
     fun doTransform(position: Int, newData: DataEntity) : ViewEntity {
         currentPosition = position
-        val result = transform(newData)
-
-        if(position < collection.size) {
-            collection[position] = result
-        } else {
-            collection.add(result)
-        }
-
-        return result
+        return transform(newData)
     }
 
-    fun getCurrentData() = if(collection.size > currentPosition) collection[currentPosition] else null
+    fun getCurrentData() = if(currentData.size > currentPosition) currentData[currentPosition] else null
 
     abstract fun transform(dataEntity: DataEntity) : ViewEntity
+
 }

@@ -1,7 +1,7 @@
 package com.vicpin.cleanrecycler.view.presenter
 
 import com.vicpin.cleanrecycler.domain.GetDataCase
-
+import com.vicpin.cleanrecycler.domain.Result
 
 /**
  * Created by Victor on 20/01/2017.
@@ -70,8 +70,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
                 onError = { onCloudErrorReceived() })
     }
 
-    private fun onCachedDataReceived(result: List<ViewEntity>) {
-        view.setData(result, fromCloud = false)
+    private fun onCachedDataReceived(result: Result<ViewEntity>) {
+        view.setData(result.data, fromCloud = false)
         view.enableRefreshing()
 
         itemsLoadedSize = result.size
@@ -91,19 +91,19 @@ class CleanListPresenter<ViewEntity, DataEntity> (
         }
     }
 
-    private fun onCloudDataReceived(result: List<ViewEntity>) {
+    private fun onCloudDataReceived(result: Result<ViewEntity>) {
         getCloudDataCase?.unsubscribe()
 
-        if(result.isEmpty()) {
+        if(result.size == 0) {
             view.hideLoadMore()
         } else if(!observableDbMode) {
             //In observableDbMode, view is updated throw db notificaions,
             // so we only pass data to view here if we do not observe bbdd
             if(currentPage == 0) {
-                view.setData(result, fromCloud = true)
+                view.setData(result.data, fromCloud = true)
                 itemsLoadedSize = result.size
             } else {
-                view.addData(result)
+                view.addData(result.data)
                 itemsLoadedSize += result.size
             }
 
@@ -115,10 +115,9 @@ class CleanListPresenter<ViewEntity, DataEntity> (
         view.hideErrorLayout()
         view.enableRefreshing()
 
-        if(itemsLoadedSize == 0 && result.isEmpty()) {
+        if(itemsLoadedSize == 0 && result.size == 0) {
             showEmptyLayout()
         }
-
     }
 
     private fun onCloudErrorReceived() {
@@ -141,10 +140,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
         if (currentPage > 0) {
             currentPage--
         }
-
-
     }
-
 
     private fun showEmptyLayout() {
 
