@@ -241,6 +241,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             presenter?.refreshData()
             eventListener?.invoke(Event.ON_REFRESH)
         }
+
+        recyclerView?.addOnScrollListener(scrollListener())
         setRefreshEnabled(refreshEnabled)
     }
 
@@ -328,14 +330,13 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
 
     override fun enableRefreshing() {
-        if(refreshEnabled) {
+        if(refreshEnabled && overallYScroll == 0) {
             refresh?.isEnabled = true
         }
     }
 
     override fun disableRefreshing() {
         refresh?.isEnabled = false
-
     }
 
     fun setRefreshEnabled(enabled: Boolean) {
@@ -447,6 +448,18 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     var isScrollingDown = false
     var isScrollingUp = false
 
+    private fun scrollListener() = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            overallYScroll += dy
+            if(overallYScroll == 0 && refreshEnabled) {
+                enableRefreshing()
+            } else {
+                disableRefreshing()
+            }
+        }
+    }
+
     fun addScrollListener(onScroll: ((Int) -> Unit)? = null, onStop: ((Int) -> Unit)? = null) {
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -460,7 +473,6 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                overallYScroll += dy
                 if(dy > 0) {
                     isScrollingDown = true
                     isScrollingUp = false
@@ -515,5 +527,6 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             it.addView(v)
         }
     }
+
 
 }
