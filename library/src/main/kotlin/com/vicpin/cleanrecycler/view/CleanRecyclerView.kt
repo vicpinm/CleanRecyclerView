@@ -39,6 +39,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     var recyclerView: RecyclerView? = null
     var marginDecoration: RecyclerView.ItemDecoration? = null
     var dividerDecoration: DividerDecoration? = null
+    var dataSetChangedListener: ((List<ViewEntity>) -> Unit)? = null
 
     var layoutManager: RecyclerView.LayoutManager? = null
         set(layoutManager) {
@@ -296,10 +297,13 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun addData(data: List<ViewEntity>) {
+        dataSetChangedListener?.invoke(adapter?.getData() ?: listOf<ViewEntity>() + data)
         adapter?.addData(data)
     }
 
     override fun setData(data: List<ViewEntity>, fromCloud: Boolean) {
+        dataSetChangedListener?.invoke(data)
+
         adapter?.setData(data)
         if (data.isNotEmpty()) {
             eventListener?.invoke(Event.DATA_LOADED)
