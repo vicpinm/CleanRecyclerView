@@ -79,7 +79,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var wrapInCardView = false
     private var dividerDrawable: Int = 0
     private var refreshEnabled = false
-    private var showHeaderIfEmptyList = false
+    private var showHeaderWithPlaceholder = false
     private var wrapInNestedScroll = false
 
     constructor(context: Context?) : super(context) {
@@ -108,7 +108,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
             wrapInCardView = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInCardView, false) ?: false
             dividerDrawable = a?.getResourceId(R.styleable.CleanRecyclerView_dividerDrawable, 0) ?: 0
             refreshEnabled = a?.getBoolean(R.styleable.CleanRecyclerView_refreshEnabled, true) ?: true
-            showHeaderIfEmptyList = a?.getBoolean(R.styleable.CleanRecyclerView_showHeaderIfEmptyList, false) ?: false
+            showHeaderWithPlaceholder = a?.getBoolean(R.styleable.CleanRecyclerView_showHeaderWithPlaceholder, false) ?: false
             wrapInNestedScroll = a?.getBoolean(R.styleable.CleanRecyclerView_wrapInNestedScroll, false) ?: false
         } finally {
             a?.recycle()
@@ -297,11 +297,13 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     }
 
     override fun addData(data: List<ViewEntity>) {
+        recyclerView?.visibility = View.VISIBLE
         dataSetChangedListener?.invoke(adapter?.getData() ?: listOf<ViewEntity>() + data)
         adapter?.addData(data)
     }
 
     override fun setData(data: List<ViewEntity>, fromCloud: Boolean) {
+        recyclerView?.visibility = View.VISIBLE
         dataSetChangedListener?.invoke(data)
 
         adapter?.setData(data)
@@ -388,8 +390,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         this.errorToast = stringRes
     }
 
-    fun setShowHeaderIfEmptyList(showHeader: Boolean) {
-        this.showHeaderIfEmptyList = showHeader
+    fun setShowHeaderWithPlaceholder(showHeader: Boolean) {
+        this.showHeaderWithPlaceholder = showHeader
     }
 
     private fun loadEmptyLayout() {
@@ -420,22 +422,38 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         emptyError?.visibility = View.GONE
         empty?.visibility = View.VISIBLE
         eventListener?.invoke(Event.EMPTY_LAYOUT_SHOWED)
+
+        if(showHeaderWithPlaceholder) {
+            recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        }
     }
 
     override fun showErrorLayout() {
         empty?.visibility = View.GONE
         emptyError?.visibility = View.VISIBLE
         eventListener?.invoke(Event.ERROR_LAYOUT_SHOWED)
+
+        if(showHeaderWithPlaceholder) {
+            recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        }
     }
 
     override fun hideEmptyLayout() {
         empty?.visibility = View.GONE
         eventListener?.invoke(Event.EMPTY_LAYOUT_HIDED)
+
+        if(showHeaderWithPlaceholder) {
+            recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
     }
 
     override fun hideErrorLayout() {
         emptyError?.visibility = View.GONE
         eventListener?.invoke(Event.ERROR_LAYOUT_HIDED)
+
+        if(showHeaderWithPlaceholder) {
+            recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
     }
 
     override fun notifyConnectionError() {
@@ -491,7 +509,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     override fun hasHeaders() = if(adapter != null) adapter!!.getHeadersCount() > 0 else false
 
-    override fun showHeaderIfEmptyList() = this.showHeaderIfEmptyList
+    override fun showHeaderWithPlaceholder() = this.showHeaderWithPlaceholder
 
     fun isEmpty(): Boolean {
         return adapter?.getData()?.isEmpty() ?: true
@@ -532,5 +550,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         }
     }
 
-
+    override fun hideHeaders() {
+        recyclerView?.visibility = View.GONE
+    }
 }

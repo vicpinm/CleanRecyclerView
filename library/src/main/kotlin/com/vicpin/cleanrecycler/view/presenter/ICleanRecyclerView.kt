@@ -34,11 +34,13 @@ interface ICleanRecyclerView<T> {
 
     fun hasHeaders() : Boolean
 
-    fun showHeaderIfEmptyList(): Boolean
+    fun showHeaderWithPlaceholder(): Boolean
 
     fun enableRefreshing()
 
     fun disableRefreshing()
 
     fun isShowingPlaceholder(): Boolean
+
+    fun hideHeaders()
 }

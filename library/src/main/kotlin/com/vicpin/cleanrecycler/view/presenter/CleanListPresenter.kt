@@ -145,9 +145,12 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     private fun showEmptyLayout() {
 
         view.hideErrorLayout()
-        if(!view.hasHeaders() || !view.showHeaderIfEmptyList()) {
-            view.showEmptyLayout()
+        view.showEmptyLayout()
+
+        if(view.hasHeaders() && !view.showHeaderWithPlaceholder()) {
+            view.hideHeaders()
         }
+
         view.hideProgress()
     }
 

@@ -9,7 +9,7 @@
         <attr name="wrapInCardView" format="boolean" />
         <attr name="dividerDrawable" format="reference" />
         <attr name="refreshEnabled" format="boolean" />
-        <attr name="showHeaderIfEmptyList" format="boolean"/>
+        <attr name="showHeaderWithPlaceholder" format="boolean"/>
         <attr name="wrapInNestedScroll" format="boolean" />
     </declare-styleable>
 </resources>
