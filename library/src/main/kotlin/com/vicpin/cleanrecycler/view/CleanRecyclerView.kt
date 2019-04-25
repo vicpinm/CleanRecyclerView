@@ -336,7 +336,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
 
     override fun enableRefreshing() {
-        if(refreshEnabled && overallYScroll == 0) {
+        if(refreshEnabled && isListAtTop()) {
             refresh?.isEnabled = true
         }
     }
@@ -474,7 +474,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             overallYScroll += dy
-            if(overallYScroll == 0 && refreshEnabled) {
+            if(isListAtTop()) {
                 enableRefreshing()
             } else {
                 disableRefreshing()
@@ -552,5 +552,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     override fun hideHeaders() {
         recyclerView?.visibility = View.GONE
+    }
+
+    fun isListAtTop(): Boolean {
+        return (layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition() == 0
     }
 }
