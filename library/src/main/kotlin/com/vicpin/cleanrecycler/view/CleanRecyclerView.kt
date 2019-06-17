@@ -423,9 +423,9 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         empty?.visibility = View.VISIBLE
         eventListener?.invoke(Event.EMPTY_LAYOUT_SHOWED)
 
-        if(showHeaderWithPlaceholder) {
+        //if(showHeaderWithPlaceholder) {
             recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        }
+        //}
     }
 
     override fun showErrorLayout() {

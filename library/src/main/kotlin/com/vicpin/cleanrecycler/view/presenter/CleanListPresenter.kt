@@ -1,5 +1,6 @@
 package com.vicpin.cleanrecycler.view.presenter
 
+import android.util.Log
 import com.vicpin.cleanrecycler.domain.GetDataCase
 import com.vicpin.cleanrecycler.domain.Result
 
@@ -59,6 +60,8 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
 
     private fun fetchCloudData(dataCase: GetDataCase<ViewEntity, DataEntity>, nextPageLoad: Boolean = false) {
+        Log.d("CleanListPresenter","fetchCloudData --> ($currentPage -- $nextPageLoad)")
+
         showProgressPlaceholderIfNeeded()
 
         if(itemsLoadedSize > 0 && !nextPageLoad) {
@@ -92,6 +95,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
     }
 
     private fun onCloudDataReceived(result: Result<ViewEntity>) {
+        Log.d("CleanListPresenter","onCloudDataReceived ->> ${result.size}")
         getCloudDataCase?.unsubscribe()
 
         if(result.size == 0) {
@@ -190,6 +194,7 @@ class CleanListPresenter<ViewEntity, DataEntity> (
 
     fun loadNextPage() {
         currentPage++
+        Log.d("CleanListPresenter","load next  --> ${currentPage}")
         if(getCloudDataCase != null) {
             fetchCloudData(getCloudDataCase, nextPageLoad = true)
         }
