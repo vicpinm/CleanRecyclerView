@@ -559,6 +559,18 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         }
     }
 
+    fun release(){
+        adapter?.release()
+
+        val itemCount = recyclerView?.adapter?.itemCount ?: 0
+        for (i in 0..itemCount) {
+            (recyclerView?.findViewHolderForAdapterPosition(i) as? ViewHolder<*>)?.onDestroy()
+        }
+        recyclerView?.adapter = null
+        recyclerView = null
+        dataSetChangedListener = null
+    }
+
     /**
      * @param v: View to add as footer inside nestedscroll
      * @param width: width of your view (MATCH_PARENT, WRAP_CONTENT)
