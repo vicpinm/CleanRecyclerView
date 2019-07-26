@@ -564,7 +564,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
         val itemCount = recyclerView?.adapter?.itemCount ?: 0
         for (i in 0..itemCount) {
-            (recyclerView?.findViewHolderForAdapterPosition(i) as? ViewHolder<*>)?.onDestroy()
+            (recyclerView?.findViewHolderForAdapterPosition(i) as? ViewHolder<*>)?.release()
         }
         recyclerView?.adapter = null
         recyclerView = null
