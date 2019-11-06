@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.vicpin.cleanrecycler.R
+import com.vicpin.cleanrecycler.domain.CleanRecyclerException
 import com.vicpin.cleanrecycler.domain.GetDataCase
 import com.vicpin.cleanrecycler.repository.ListRepository
 import com.vicpin.cleanrecycler.repository.datasource.*
@@ -85,6 +86,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var showHeaderWithPlaceholder = false
     private var wrapInNestedScroll = false
     private var progressBarColor = 0
+
+    var errorCallback: ((error: CleanRecyclerException) -> Unit)? = null
 
     constructor(context: Context?) : super(context) {
         inflate()
@@ -559,7 +562,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         }
     }
 
-    fun release(){
+    fun release() {
         adapter?.release()
 
         val itemCount = recyclerView?.adapter?.itemCount ?: 0
@@ -593,5 +596,10 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     fun isListAtTop(): Boolean {
         return (layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition() == 0
+    }
+
+
+    override fun onErrorReceived(error: CleanRecyclerException) {
+        errorCallback?.invoke(error)
     }
 }

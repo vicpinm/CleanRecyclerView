@@ -1,5 +1,7 @@
 package com.vicpin.cleanrecycler.view.presenter
 
+import com.vicpin.cleanrecycler.domain.CleanRecyclerException
+
 /**
  * Created by Victor on 20/01/2017.
  */
@@ -43,4 +45,6 @@ interface ICleanRecyclerView<T> {
     fun isShowingPlaceholder(): Boolean
 
     fun hideHeaders()
+
+    fun onErrorReceived(error: CleanRecyclerException)
 }
