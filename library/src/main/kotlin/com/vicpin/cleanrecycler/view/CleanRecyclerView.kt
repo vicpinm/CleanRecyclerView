@@ -80,6 +80,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     private var errorLayout: Int = 0
     private var errorToast: Int = 0
     private var eventListener: ((Event) -> Unit)? = null
+    private var listEventListener: MutableList<((Event) -> Unit)> = mutableListOf()
     private var wrapInCardView = false
     private var dividerDrawable: Int = 0
     private var refreshEnabled = false
@@ -136,6 +137,19 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         }
     }
 
+    fun addEventListener(listener: (Event) -> Unit) {
+        this.listEventListener.add(listener)
+        if (inited) {
+            listener(Event.VIEW_LOADED)
+        }
+    }
+
+    fun reportListenersState(event:Event){
+        this.listEventListener.forEach {
+            it.invoke(event)
+        }
+    }
+
     private fun inflate() {
         inflateView()
         isAttached = true
@@ -143,6 +157,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         loadErrorLayout()
 
         this.eventListener?.invoke(Event.VIEW_LOADED)
+        reportListenersState(Event.VIEW_LOADED)
     }
 
     private fun inflateView() {
@@ -271,6 +286,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         refresh?.setOnRefreshListener {
             presenter?.refreshData()
             eventListener?.invoke(Event.ON_REFRESH)
+            reportListenersState(Event.ON_REFRESH)
         }
 
         recyclerView?.addOnScrollListener(scrollListener())
@@ -339,7 +355,11 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         adapter?.setData(data)
         if (data.isNotEmpty()) {
             eventListener?.invoke(Event.DATA_LOADED)
+            reportListenersState(Event.DATA_LOADED)
+
             eventListener?.invoke(if (fromCloud) Event.DATA_LOADED_FROM_CLOUD else Event.DATA_LOADED_FROM_CACHE)
+            reportListenersState(if (fromCloud) Event.DATA_LOADED_FROM_CLOUD else Event.DATA_LOADED_FROM_CACHE)
+
         }
     }
 
@@ -451,6 +471,8 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         emptyError?.visibility = View.GONE
         empty?.visibility = View.VISIBLE
         eventListener?.invoke(Event.EMPTY_LAYOUT_SHOWED)
+        reportListenersState(Event.EMPTY_LAYOUT_SHOWED)
+
 
         //if(showHeaderWithPlaceholder) {
         recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -461,6 +483,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         empty?.visibility = View.GONE
         emptyError?.visibility = View.VISIBLE
         eventListener?.invoke(Event.ERROR_LAYOUT_SHOWED)
+        reportListenersState(Event.ERROR_LAYOUT_SHOWED)
 
         if (showHeaderWithPlaceholder) {
             recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -470,6 +493,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     override fun hideEmptyLayout() {
         empty?.visibility = View.GONE
         eventListener?.invoke(Event.EMPTY_LAYOUT_HIDED)
+        reportListenersState(Event.EMPTY_LAYOUT_HIDED)
 
         if (showHeaderWithPlaceholder) {
             recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
@@ -479,6 +503,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
     override fun hideErrorLayout() {
         emptyError?.visibility = View.GONE
         eventListener?.invoke(Event.ERROR_LAYOUT_HIDED)
+        reportListenersState(Event.ERROR_LAYOUT_HIDED)
 
         if (showHeaderWithPlaceholder) {
             recyclerView?.layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
@@ -487,6 +512,7 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
 
     override fun notifyConnectionError() {
         eventListener?.invoke(Event.CONNECTION_ERROR)
+        reportListenersState(Event.CONNECTION_ERROR)
     }
 
     override fun showErrorToast() {
