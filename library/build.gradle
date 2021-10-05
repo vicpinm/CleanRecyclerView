@@ -6,7 +6,7 @@ group = 'com.github.vicpinm'
 //apply from: 'maven-push.gradle'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     buildToolsVersion '28.0.3'
 
     androidExtensions {
@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -46,12 +46,13 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     testCompile 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     // Rx Android
     api 'io.reactivex.rxjava2:rxjava:2.1.16'
@@ -59,7 +60,7 @@ dependencies {
 
    // api 'com.github.DigioAndroid:KPresenterAdapter:1.1.5'
     //api project(":kpresenteradapter")
-    api 'com.github.DigioAndroid:KPresenterAdapter:1.1.6'
+    api 'com.github.DigioAndroid:KPresenterAdapter:1.1.7-alpha'
     implementation "com.github.vicpinm:autosubscription:$autosubscription"
     implementation 'com.github.vicpinm:crv-annotations:5.0.1'
 
