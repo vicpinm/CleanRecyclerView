@@ -225,6 +225,10 @@ open class CleanRecyclerView<ViewEntity : Any, DataEntity : Any> : RelativeLayou
         loadPaged(adapter, cloud?.newInstance(), cache?.newInstance(), mapper, customData)
     }
 
+    fun unsubscribeOngoingDataSources(){
+        presenter?.unsubscribeOngoingDataSources()
+    }
+
     /**
      * Load methods with no pagination
      */

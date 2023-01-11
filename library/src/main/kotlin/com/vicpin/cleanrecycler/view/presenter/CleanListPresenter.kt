@@ -209,5 +209,10 @@ class CleanListPresenter<ViewEntity, DataEntity>(
         }
     }
 
+    fun unsubscribeOngoingDataSources() {
+        getCachedDataCase?.unsubscribe()
+        getCloudDataCase?.unsubscribe()
+    }
+
 
 }
