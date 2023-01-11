@@ -11,5 +11,6 @@
         <attr name="refreshEnabled" format="boolean" />
         <attr name="showHeaderWithPlaceholder" format="boolean"/>
         <attr name="wrapInNestedScroll" format="boolean" />
+        <attr name="progressBarColor" format="reference" />
     </declare-styleable>
 </resources>

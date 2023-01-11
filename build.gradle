@@ -44,8 +44,8 @@ ext {
     runnerVersion = "1.1.1"
     rulesVersion = "1.1.1"
     espressoVersion = "3.1.1"
-    materialVersion = "1.0.0"
-    appCompat = "1.0.2"
+    materialVersion = "1.4.0"
+    appCompat = "1.3.1"
     cardView = "1.0.0"
     constraint = "2.0.0-alpha3"
 
